@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+modbus_env/
+scada_config/*.bak
+*.log
