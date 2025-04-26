@@ -25,13 +25,13 @@ This project simulates a basic SCADA (Supervisory Control and Data Acquisition) 
 ---
 
 ## 🧱 Folder Structure
-scada_project/
-├── app.py              # Flask server serving configuration as JSON
-├── config_reader.py    # Configuration loading utility (optional modularization)
-├── modbus_sim.py       # Modbus server simulation logic (in progress)
-├── scada_config/
-│   └── config.json     # JSON configuration file for simulation
-├── .gitignore          # Ignores virtual envs, logs, __pycache__, etc.
+scada_project/<br>
+├── app.py              # Flask server serving configuration as JSON<br>
+├── config_reader.py    # Configuration loading utility (optional modularization)<br>
+├── modbus_sim.py       # Modbus server simulation logic (in progress)<br>
+├── scada_config/<br>
+│   └── config.json     # JSON configuration file for simulation<br>
+├── .gitignore          # Ignores virtual envs, logs, __pycache__, etc.<br>
 └── README.md           # Project overview and documentation
 
 ⚙️ Setup Instructions (Raspberry Pi)
