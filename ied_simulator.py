@@ -24,29 +24,33 @@ server_context = None
 class IEDSimulator:
     def __init__(self):
         # Initialize data blocks based on RTAC configuration
-        # Coils (0x): Read/Write - Digital Outputs
+        # NOTE: ModbusSequentialDataBlock uses 1-based addressing internally
+        # but we pass 0 to start from address 0
+        
+        # Coils (0x): Read/Write - Digital Outputs (addresses 0-99)
         self.coils = ModbusSequentialDataBlock(0, [0] * 100)
         
-        # Discrete Inputs (1x): Read Only - Digital Inputs
+        # Discrete Inputs (1x): Read Only - Digital Inputs (addresses 0-99)
         self.discrete_inputs = ModbusSequentialDataBlock(0, [0, 0] + [0] * 98)
         
-        # Holding Registers (4x): Read/Write - Analog Outputs
+        # Holding Registers (4x): Read/Write - Analog Outputs (addresses 0-99)
         self.holding_registers = ModbusSequentialDataBlock(0, [0] * 100)
         
-        # Input Registers (3x): Read Only - Analog Inputs
+        # Input Registers (3x): Read Only - Analog Inputs (addresses 0-99)
         # Initialize with default values from your config
         input_reg_defaults = [100, 200, 0] + [0] * 97  # SIM_AI_00=100, SIM_AI_01=200, IREG_00002=0
         self.input_registers = ModbusSequentialDataBlock(0, input_reg_defaults)
         
         # Create slave context
         self.slave_context = ModbusSlaveContext(
-            di=self.discrete_inputs,
-            co=self.coils,
-            hr=self.holding_registers,
-            ir=self.input_registers
+            di=self.discrete_inputs,  # Discrete Inputs
+            co=self.coils,            # Coils
+            hr=self.holding_registers,  # Holding Registers
+            ir=self.input_registers,    # Input Registers
+            zero_mode=True  # Use zero-based addressing
         )
         
-        # Create server context
+        # Create server context - note that single=False means we use specific slave IDs
         self.server_context = ModbusServerContext(
             slaves={MODBUS_ADDRESS: self.slave_context},
             single=False
@@ -164,7 +168,7 @@ def run_modbus_server():
     """Run Modbus TCP server"""
     logging.basicConfig()
     log = logging.getLogger()
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)  # Set to DEBUG to see all Modbus traffic
     
     # Device identification
     identity = ModbusDeviceIdentification()
@@ -177,6 +181,7 @@ def run_modbus_server():
     
     print(f"Starting Modbus TCP Server on {SERVER_IP}:{SERVER_PORT}")
     print(f"Modbus Address: {MODBUS_ADDRESS}")
+    print("Waiting for connections...")
     
     StartTcpServer(
         server_context,
