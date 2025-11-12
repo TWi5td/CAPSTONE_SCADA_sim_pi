@@ -1,16 +1,21 @@
 import asyncio
 import json
 import os
+import logging
 
 from pymodbus.datastore import (
     ModbusSequentialDataBlock,
     ModbusSlaveContext,
     ModbusServerContext,
 )
-from pymodbus.server import ModbusTcpServer
-from pymodbus import pymodbus_apply_logging_config
+from pymodbus.server import StartAsyncTcpServer
 
 MODBUS_ADDRESS = 254
+
+# Configure logging
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.INFO)
 
 # Load config file
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,10 +48,8 @@ port = config["port"]
 
 
 async def run_modbus_server():
-    pymodbus_apply_logging_config()
     print(f"Starting Modbus TCP Server on {ip}:{port}")
-    server = ModbusTcpServer(context=context, address=(ip, port))
-    await server.serve_forever()
+    await StartAsyncTcpServer(context=context, address=(ip, port))
 
 
 if __name__ == "__main__":
