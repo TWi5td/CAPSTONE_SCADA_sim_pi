@@ -10,6 +10,7 @@ from pymodbus.datastore import (
 from pymodbus.server import ModbusTcpServer
 from pymodbus import pymodbus_apply_logging_config
 
+MODBUS_ADDRESS = 254
 
 # Load config file
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +32,8 @@ store = ModbusSlaveContext(
     di=ModbusSequentialDataBlock(0, binary_inputs),          # Discrete Inputs (1xxxx)
     co=ModbusSequentialDataBlock(0, binary_outputs),         # Coils (0xxxx)
     hr=ModbusSequentialDataBlock(0, analog_outputs),         # Holding Registers (4xxxx)
-    ir=ModbusSequentialDataBlock(0, analog_inputs + counters) # Input Registers (3xxxx)
+    ir=ModbusSequentialDataBlock(0, analog_inputs + counters), # Input Registers (3xxxx)
+    unit=MODBUS_ADDRESS
 )
 
 context = ModbusServerContext(slaves=store, single=True)
