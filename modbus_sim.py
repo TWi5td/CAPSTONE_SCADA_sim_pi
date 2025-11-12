@@ -3,7 +3,7 @@ import json
 import os
 
 from pymodbus.datastore.context import ModbusServerContext
-from pymodbus.datastore.store import ModbusSlaveContext, ModbusSequentialDataBlock
+from pymodbus.datastore import ModbusSlaveContext, ModbusSequentialDataBlock
 
 from pymodbus.server import ModbusTcpServer
 from pymodbus import pymodbus_apply_logging_config
