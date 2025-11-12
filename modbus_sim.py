@@ -2,11 +2,9 @@ import asyncio
 import json
 import os
 
-from pymodbus.datastore import (
-    ModbusSequentialDataBlock,
-    ModbusSlaveContext,
-    ModbusServerContext,
-)
+from pymodbus.datastore.context import ModbusServerContext
+from pymodbus.datastore.store import ModbusSlaveContext, ModbusSequentialDataBlock
+
 from pymodbus.server import ModbusTcpServer
 from pymodbus import pymodbus_apply_logging_config
 
