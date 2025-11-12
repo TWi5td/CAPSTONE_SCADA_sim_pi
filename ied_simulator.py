@@ -12,7 +12,7 @@ import logging
 
 # Configuration from RTAC settings
 MODBUS_ADDRESS = 254
-SERVER_IP = "192.168.254.66"
+SERVER_IP = "0.0.0.0"
 SERVER_PORT = 5002
 
 # Flask app for web interface
