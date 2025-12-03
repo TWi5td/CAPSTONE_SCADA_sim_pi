@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Data Simulation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            background: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background: #2d4a7c;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #1a365d;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a365d;
+            font-weight: 600;
+        }
+        
+        .sim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .sim-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #1a365d;
+        }
+        
+        .sim-card h3 {
+            color: #1a365d;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        
+        .sim-controls {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .control-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #1a365d;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #2d4a7c;
+        }
+        
+        .btn.stop {
+            background: #c53030;
+        }
+        
+        .btn.stop:hover {
+            background: #9b2c2c;
+        }
+        
+        .btn.success {
+            background: #276749;
+        }
+        
+        .btn.success:hover {
+            background: #2f855a;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-running {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .status-stopped {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #cbd5e0;
+        }
+        
+        .preview-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .preview-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a365d;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            background: white;
+            border-radius: 4px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .pulse-sim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .pulse-btn {
+            padding: 15px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .pulse-btn:hover {
+            background: #2d3748;
+        }
+        
+        .pulse-btn.active {
+            background: #276749;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Live Data Simulation</h1>
+            <p>Generate realistic waveforms and patterns for testing</p>
+            <div class="nav-buttons">
+                <a href="/" class="nav-btn">Dashboard</a>
+                <a href="/simulation" class="nav-btn">Live Simulation</a>
+                <a href="/variables" class="nav-btn">Custom Variables</a>
+            </div>
+        </header>
+
+        <div class="section">
+            <h2>Waveform Generators</h2>
+            <div class="sim-grid">
+                <!-- Sine Wave Generator -->
+                <div class="sim-card">
+                    <h3>
+                        Sine Wave
+                        <span class="status-badge status-stopped" id="sine-status">Stopped</span>
+                    </h3>
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Register:</label>
+                            <input type="number" id="sine-register" value="0" min="0" max="99">
+                        </div>
+                        <div class="control-group">
+                            <label>Amplitude:</label>
+                            <input type="number" id="sine-amplitude" value="1000" min="1" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Frequency (Hz):</label>
+                            <input type="number" id="sine-frequency" value="0.5" min="0.01" max="10" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label>Offset:</label>
+                            <input type="number" id="sine-offset" value="0" min="-32768" max="32767">
+                        </div>
+                        <button class="btn" id="sine-start" onclick="toggleSineWave()">Start</button>
+                    </div>
+                    <div class="preview">
+                        <div class="preview-label">Current Value:</div>
+                        <div class="preview-value" id="sine-value">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="sine-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Ramp Generator -->
+                <div class="sim-card">
+                    <h3>
+                        Ramp / Sawtooth
+                        <span class="status-badge status-stopped" id="ramp-status">Stopped</span>
+                    </h3>
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Register:</label>
+                            <input type="number" id="ramp-register" value="1" min="0" max="99">
+                        </div>
+                        <div class="control-group">
+                            <label>Min Value:</label>
+                            <input type="number" id="ramp-min" value="0" min="-32768" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Max Value:</label>
+                            <input type="number" id="ramp-max" value="1000" min="-32768" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Period (s):</label>
+                            <input type="number" id="ramp-period" value="10" min="1" max="300">
+                        </div>
+                        <button class="btn" id="ramp-start" onclick="toggleRamp()">Start</button>
+                    </div>
+                    <div class="preview">
+                        <div class="preview-label">Current Value:</div>
+                        <div class="preview-value" id="ramp-value">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ramp-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Random Walk Generator -->
+                <div class="sim-card">
+                    <h3>
+                        Random Walk
+                        <span class="status-badge status-stopped" id="random-status">Stopped</span>
+                    </h3>
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Register:</label>
+                            <input type="number" id="random-register" value="2" min="0" max="99">
+                        </div>
+                        <div class="control-group">
+                            <label>Start Value:</label>
+                            <input type="number" id="random-start-value" value="500" min="-32768" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Step Size:</label>
+                            <input type="number" id="random-step" value="50" min="1" max="1000">
+                        </div>
+                        <div class="control-group">
+                            <label>Min/Max:</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="number" id="random-min" value="0" min="-32768" max="32767" style="width: 50%;">
+                                <input type="number" id="random-max" value="1000" min="-32768" max="32767" style="width: 50%;">
+                            </div>
+                        </div>
+                        <button class="btn" id="random-start-btn" onclick="toggleRandom()">Start</button>
+                    </div>
+                    <div class="preview">
+                        <div class="preview-label">Current Value:</div>
+                        <div class="preview-value" id="random-value">500</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="random-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Square Wave Generator -->
+                <div class="sim-card">
+                    <h3>
+                        Square Wave
+                        <span class="status-badge status-stopped" id="square-status">Stopped</span>
+                    </h3>
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Register:</label>
+                            <input type="number" id="square-register" value="3" min="0" max="99">
+                        </div>
+                        <div class="control-group">
+                            <label>High Value:</label>
+                            <input type="number" id="square-high" value="1000" min="-32768" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Low Value:</label>
+                            <input type="number" id="square-low" value="0" min="-32768" max="32767">
+                        </div>
+                        <div class="control-group">
+                            <label>Period (s):</label>
+                            <input type="number" id="square-period" value="4" min="0.5" max="60" step="0.5">
+                        </div>
+                        <button class="btn" id="square-start" onclick="toggleSquareWave()">Start</button>
+                    </div>
+                    <div class="preview">
+                        <div class="preview-label">Current Value:</div>
+                        <div class="preview-value" id="square-value">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="square-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Digital Pulse Simulation</h2>
+            <p style="color: #666; margin-bottom: 15px;">Click to toggle discrete inputs (simulating breaker trips, alarms, etc.)</p>
+            <div class="pulse-sim-grid">
+                <button class="pulse-btn" id="pulse-0" onclick="togglePulse(0)">DI_00000</button>
+                <button class="pulse-btn" id="pulse-1" onclick="togglePulse(1)">DI_00001</button>
+                <button class="pulse-btn" id="pulse-2" onclick="togglePulse(2)">DI_00002</button>
+                <button class="pulse-btn" id="pulse-3" onclick="togglePulse(3)">DI_00003</button>
+                <button class="pulse-btn" id="pulse-4" onclick="togglePulse(4)">DI_00004</button>
+                <button class="pulse-btn" id="pulse-5" onclick="togglePulse(5)">DI_00005</button>
+                <button class="pulse-btn" id="pulse-6" onclick="togglePulse(6)">DI_00006</button>
+                <button class="pulse-btn" id="pulse-7" onclick="togglePulse(7)">DI_00007</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Simulation Control</h2>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn stop" onclick="stopAllSimulations()" style="width: auto;">Stop All Simulations</button>
+                <button class="btn success" onclick="saveSimulationConfig()" style="width: auto;">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const simulations = {
+            sine: { active: false, interval: null, phase: 0, history: [] },
+            ramp: { active: false, interval: null, currentValue: 0, history: [] },
+            random: { active: false, interval: null, currentValue: 500, history: [] },
+            square: { active: false, interval: null, state: false, history: [] }
+        };
+
+        const charts = {
+            sine: document.getElementById('sine-chart').getContext('2d'),
+            ramp: document.getElementById('ramp-chart').getContext('2d'),
+            random: document.getElementById('random-chart').getContext('2d'),
+            square: document.getElementById('square-chart').getContext('2d')
+        };
+
+        Object.keys(charts).forEach(key => {
+            const ctx = charts[key];
+            ctx.canvas.width = ctx.canvas.offsetWidth;
+            ctx.canvas.height = ctx.canvas.offsetHeight;
+        });
+
+        function drawChart(chartName, values) {
+            const ctx = charts[chartName];
+            const canvas = ctx.canvas;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (values.length < 2) return;
+            
+            const max = Math.max(...values);
+            const min = Math.min(...values);
+            const range = max - min || 1;
+            
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                const y = (canvas.height / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            ctx.strokeStyle = '#1a365d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const step = canvas.width / (values.length - 1);
+            values.forEach((value, i) => {
+                const x = i * step;
+                const y = canvas.height - ((value - min) / range) * (canvas.height - 20) - 10;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+        }
+
+        function toggleSineWave() {
+            const sim = simulations.sine;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('sine-status').textContent = 'Stopped';
+                document.getElementById('sine-status').className = 'status-badge status-stopped';
+                document.getElementById('sine-start').textContent = 'Start';
+            } else {
+                const register = parseInt(document.getElementById('sine-register').value);
+                const amplitude = parseInt(document.getElementById('sine-amplitude').value);
+                const frequency = parseFloat(document.getElementById('sine-frequency').value);
+                const offset = parseInt(document.getElementById('sine-offset').value);
+                
+                sim.phase = 0;
+                sim.history = [];
+                sim.active = true;
+                
+                document.getElementById('sine-status').textContent = 'Running';
+                document.getElementById('sine-status').className = 'status-badge status-running';
+                document.getElementById('sine-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    const value = Math.round(amplitude * Math.sin(sim.phase) + offset);
+                    sim.phase += 2 * Math.PI * frequency * 0.1;
+                    
+                    document.getElementById('sine-value').textContent = value;
+                    
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: register, value: value})
+                    });
+                    
+                    sim.history.push(value);
+                    if (sim.history.length > 100) sim.history.shift();
+                    drawChart('sine', sim.history);
+                }, 100);
+            }
+        }
+
+        function toggleRamp() {
+            const sim = simulations.ramp;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('ramp-status').textContent = 'Stopped';
+                document.getElementById('ramp-status').className = 'status-badge status-stopped';
+                document.getElementById('ramp-start').textContent = 'Start';
+            } else {
+                const register = parseInt(document.getElementById('ramp-register').value);
+                const minVal = parseInt(document.getElementById('ramp-min').value);
+                const maxVal = parseInt(document.getElementById('ramp-max').value);
+                const period = parseInt(document.getElementById('ramp-period').value);
+                
+                sim.currentValue = minVal;
+                sim.history = [];
+                sim.active = true;
+                
+                const step = (maxVal - minVal) / (period * 10);
+                
+                document.getElementById('ramp-status').textContent = 'Running';
+                document.getElementById('ramp-status').className = 'status-badge status-running';
+                document.getElementById('ramp-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    sim.currentValue += step;
+                    if (sim.currentValue >= maxVal) {
+                        sim.currentValue = minVal;
+                    }
+                    
+                    const value = Math.round(sim.currentValue);
+                    document.getElementById('ramp-value').textContent = value;
+                    
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: register, value: value})
+                    });
+                    
+                    sim.history.push(value);
+                    if (sim.history.length > 100) sim.history.shift();
+                    drawChart('ramp', sim.history);
+                }, 100);
+            }
+        }
+
+        function toggleRandom() {
+            const sim = simulations.random;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('random-status').textContent = 'Stopped';
+                document.getElementById('random-status').className = 'status-badge status-stopped';
+                document.getElementById('random-start-btn').textContent = 'Start';
+            } else {
+                const register = parseInt(document.getElementById('random-register').value);
+                const startVal = parseInt(document.getElementById('random-start-value').value);
+                const stepSize = parseInt(document.getElementById('random-step').value);
+                const minVal = parseInt(document.getElementById('random-min').value);
+                const maxVal = parseInt(document.getElementById('random-max').value);
+                
+                sim.currentValue = startVal;
+                sim.history = [];
+                sim.active = true;
+                
+                document.getElementById('random-status').textContent = 'Running';
+                document.getElementById('random-status').className = 'status-badge status-running';
+                document.getElementById('random-start-btn').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    const change = (Math.random() - 0.5) * 2 * stepSize;
+                    sim.currentValue += change;
+                    sim.currentValue = Math.max(minVal, Math.min(maxVal, sim.currentValue));
+                    
+                    const value = Math.round(sim.currentValue);
+                    document.getElementById('random-value').textContent = value;
+                    
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: register, value: value})
+                    });
+                    
+                    sim.history.push(value);
+                    if (sim.history.length > 100) sim.history.shift();
+                    drawChart('random', sim.history);
+                }, 100);
+            }
+        }
+
+        function toggleSquareWave() {
+            const sim = simulations.square;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('square-status').textContent = 'Stopped';
+                document.getElementById('square-status').className = 'status-badge status-stopped';
+                document.getElementById('square-start').textContent = 'Start';
+            } else {
+                const register = parseInt(document.getElementById('square-register').value);
+                const highVal = parseInt(document.getElementById('square-high').value);
+                const lowVal = parseInt(document.getElementById('square-low').value);
+                const period = parseFloat(document.getElementById('square-period').value);
+                
+                sim.state = false;
+                sim.history = [];
+                sim.active = true;
+                
+                document.getElementById('square-status').textContent = 'Running';
+                document.getElementById('square-status').className = 'status-badge status-running';
+                document.getElementById('square-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    sim.state = !sim.state;
+                    const value = sim.state ? highVal : lowVal;
+                    
+                    document.getElementById('square-value').textContent = value;
+                    
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: register, value: value})
+                    });
+                    
+                    for (let i = 0; i < 5; i++) {
+                        sim.history.push(value);
+                    }
+                    if (sim.history.length > 100) sim.history = sim.history.slice(-100);
+                    drawChart('square', sim.history);
+                }, period * 500);
+            }
+        }
+
+        function togglePulse(address) {
+            const btn = document.getElementById(`pulse-${address}`);
+            const isActive = btn.classList.contains('active');
+            
+            fetch('/api/set_discrete_input', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({address: address, value: isActive ? 0 : 1})
+            }).then(() => {
+                if (isActive) {
+                    btn.classList.remove('active');
+                } else {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function stopAllSimulations() {
+            Object.keys(simulations).forEach(key => {
+                const sim = simulations[key];
+                if (sim.active) {
+                    clearInterval(sim.interval);
+                    sim.active = false;
+                    document.getElementById(`${key}-status`).textContent = 'Stopped';
+                    document.getElementById(`${key}-status`).className = 'status-badge status-stopped';
+                    const btnId = key === 'random' ? 'random-start-btn' : `${key}-start`;
+                    document.getElementById(btnId).textContent = 'Start';
+                }
+            });
+        }
+
+        function saveSimulationConfig() {
+            const config = {
+                sine: {
+                    register: parseInt(document.getElementById('sine-register').value),
+                    amplitude: parseInt(document.getElementById('sine-amplitude').value),
+                    frequency: parseFloat(document.getElementById('sine-frequency').value),
+                    offset: parseInt(document.getElementById('sine-offset').value)
+                },
+                ramp: {
+                    register: parseInt(document.getElementById('ramp-register').value),
+                    min: parseInt(document.getElementById('ramp-min').value),
+                    max: parseInt(document.getElementById('ramp-max').value),
+                    period: parseInt(document.getElementById('ramp-period').value)
+                },
+                random: {
+                    register: parseInt(document.getElementById('random-register').value),
+                    start: parseInt(document.getElementById('random-start-value').value),
+                    step: parseInt(document.getElementById('random-step').value),
+                    min: parseInt(document.getElementById('random-min').value),
+                    max: parseInt(document.getElementById('random-max').value)
+                },
+                square: {
+                    register: parseInt(document.getElementById('square-register').value),
+                    high: parseInt(document.getElementById('square-high').value),
+                    low: parseInt(document.getElementById('square-low').value),
+                    period: parseFloat(document.getElementById('square-period').value)
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'simulation_config.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

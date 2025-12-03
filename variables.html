@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom Variables</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            background: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background: #2d4a7c;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #1a365d;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a365d;
+            font-weight: 600;
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: grid;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1a365d;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #2d4a7c;
+        }
+        
+        .btn.success {
+            background: #276749;
+        }
+        
+        .btn.success:hover {
+            background: #2f855a;
+        }
+        
+        .btn.danger {
+            background: #c53030;
+        }
+        
+        .btn.danger:hover {
+            background: #9b2c2c;
+        }
+        
+        .variable-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .variable-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #1a365d;
+            display: grid;
+            gap: 10px;
+        }
+        
+        .variable-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .variable-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        
+        .variable-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .variable-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-top: 4px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #1a365d;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #cbd5e0;
+        }
+        
+        .scaling-section {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .scaling-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .tag {
+            background: #1a365d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Custom Variables</h1>
+            <p>Create and manage custom Modbus variables with scaling and mapping</p>
+            <div class="nav-buttons">
+                <a href="/" class="nav-btn">Dashboard</a>
+                <a href="/simulation" class="nav-btn">Live Simulation</a>
+                <a href="/variables" class="nav-btn">Custom Variables</a>
+            </div>
+        </header>
+
+        <div class="section">
+            <h2>Create New Variable</h2>
+            <button class="btn success" onclick="showCreateModal()">Create Custom Variable</button>
+        </div>
+
+        <div class="section">
+            <h2>Your Custom Variables</h2>
+            <div id="variable-list" class="variable-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">[No Data]</div>
+                    <p>No custom variables yet. Create your first one!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Configuration Management</h2>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn success" onclick="exportVariables()">Export Variables</button>
+                <button class="btn" onclick="document.getElementById('import-input').click()">Import Variables</button>
+                <input type="file" id="import-input" accept=".json" style="display: none;" onchange="importVariables(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div id="variable-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Create Custom Variable</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Variable Name</label>
+                    <input type="text" id="var-name" placeholder="e.g., VOLTAGE_L1">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="var-description" placeholder="Optional description of this variable"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Register Type</label>
+                    <select id="var-type">
+                        <option value="input_register">Input Register (Read Only)</option>
+                        <option value="holding_register">Holding Register (Read/Write)</option>
+                        <option value="discrete_input">Discrete Input (Digital Read Only)</option>
+                        <option value="coil">Coil (Digital Read/Write)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Register Address (0-99)</label>
+                    <input type="number" id="var-address" min="0" max="99" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Data Type</label>
+                    <select id="var-data-type">
+                        <option value="int16">INT16 (-32768 to 32767)</option>
+                        <option value="uint16">UINT16 (0 to 65535)</option>
+                        <option value="float">FLOAT (with scaling)</option>
+                        <option value="bool">BOOL (0/1)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Default Value</label>
+                    <input type="number" id="var-default" value="0">
+                </div>
+                
+                <div class="scaling-section">
+                    <h4 style="margin-bottom: 10px; color: #1a365d;">Engineering Unit Scaling</h4>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        Convert raw Modbus values to engineering units (e.g., 0-1000 to 0.0-100.0%)
+                    </p>
+                    
+                    <div class="form-group">
+                        <label>Enable Scaling</label>
+                        <select id="var-scaling-enabled" onchange="toggleScaling()">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    
+                    <div id="scaling-params" style="display: none;">
+                        <div class="scaling-grid">
+                            <div class="form-group">
+                                <label>Raw Min</label>
+                                <input type="number" id="var-raw-min" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Raw Max</label>
+                                <input type="number" id="var-raw-max" value="1000">
+                            </div>
+                            <div class="form-group">
+                                <label>Scaled Min</label>
+                                <input type="number" id="var-scaled-min" value="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Scaled Max</label>
+                                <input type="number" id="var-scaled-max" value="100" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Engineering Unit</label>
+                            <input type="text" id="var-unit" placeholder="e.g., %, A, V, kW">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input type="text" id="var-tags" placeholder="e.g., analog, voltage, phase1">
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn success" onclick="saveVariable()" style="flex: 1;">Save Variable</button>
+                    <button class="btn" onclick="closeModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditVariable = null;
+
+        function showCreateModal() {
+            currentEditVariable = null;
+            document.getElementById('modal-title').textContent = 'Create Custom Variable';
+            document.getElementById('var-name').value = '';
+            document.getElementById('var-description').value = '';
+            document.getElementById('var-type').value = 'input_register';
+            document.getElementById('var-address').value = '0';
+            document.getElementById('var-data-type').value = 'int16';
+            document.getElementById('var-default').value = '0';
+            document.getElementById('var-scaling-enabled').value = 'false';
+            document.getElementById('var-raw-min').value = '0';
+            document.getElementById('var-raw-max').value = '1000';
+            document.getElementById('var-scaled-min').value = '0';
+            document.getElementById('var-scaled-max').value = '100';
+            document.getElementById('var-unit').value = '';
+            document.getElementById('var-tags').value = '';
+            toggleScaling();
+            document.getElementById('variable-modal').classList.add('active');
+        }
+
+        function showEditModal(varName, varData) {
+            currentEditVariable = varName;
+            document.getElementById('modal-title').textContent = 'Edit Variable';
+            document.getElementById('var-name').value = varName;
+            document.getElementById('var-description').value = varData.description || '';
+            document.getElementById('var-type').value = varData.register_type || 'input_register';
+            document.getElementById('var-address').value = varData.address || 0;
+            document.getElementById('var-data-type').value = varData.data_type || 'int16';
+            document.getElementById('var-default').value = varData.default_value || 0;
+            
+            const hasScaling = varData.scaling && varData.scaling.enabled;
+            document.getElementById('var-scaling-enabled').value = hasScaling ? 'true' : 'false';
+            
+            if (hasScaling) {
+                document.getElementById('var-raw-min').value = varData.scaling.raw_min;
+                document.getElementById('var-raw-max').value = varData.scaling.raw_max;
+                document.getElementById('var-scaled-min').value = varData.scaling.scaled_min;
+                document.getElementById('var-scaled-max').value = varData.scaling.scaled_max;
+                document.getElementById('var-unit').value = varData.scaling.unit || '';
+            }
+            
+            document.getElementById('var-tags').value = (varData.tags || []).join(', ');
+            toggleScaling();
+            document.getElementById('variable-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('variable-modal').classList.remove('active');
+        }
+
+        function toggleScaling() {
+            const enabled = document.getElementById('var-scaling-enabled').value === 'true';
+            document.getElementById('scaling-params').style.display = enabled ? 'block' : 'none';
+        }
+
+        function saveVariable() {
+            const name = document.getElementById('var-name').value.trim();
+            if (!name) {
+                alert('Please enter a variable name');
+                return;
+            }
+            
+            const scalingEnabled = document.getElementById('var-scaling-enabled').value === 'true';
+            
+            const varConfig = {
+                description: document.getElementById('var-description').value,
+                register_type: document.getElementById('var-type').value,
+                address: parseInt(document.getElementById('var-address').value),
+                data_type: document.getElementById('var-data-type').value,
+                default_value: parseFloat(document.getElementById('var-default').value),
+                scaling: scalingEnabled ? {
+                    enabled: true,
+                    raw_min: parseFloat(document.getElementById('var-raw-min').value),
+                    raw_max: parseFloat(document.getElementById('var-raw-max').value),
+                    scaled_min: parseFloat(document.getElementById('var-scaled-min').value),
+                    scaled_max: parseFloat(document.getElementById('var-scaled-max').value),
+                    unit: document.getElementById('var-unit').value
+                } : { enabled: false },
+                tags: document.getElementById('var-tags').value.split(',').map(t => t.trim()).filter(t => t),
+                created_at: new Date().toISOString()
+            };
+            
+            fetch('/api/custom_variables', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name: name, config: varConfig})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    loadVariables();
+                } else {
+                    alert('Error saving variable: ' + data.message);
+                }
+            });
+        }
+
+        function deleteVariable(varName) {
+            if (!confirm(`Are you sure you want to delete ${varName}?`)) {
+                return;
+            }
+            
+            fetch(`/api/custom_variables/${varName}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadVariables();
+                } else {
+                    alert('Error deleting variable: ' + data.message);
+                }
+            });
+        }
+
+        function loadVariables() {
+            fetch('/api/custom_variables')
+                .then(response => response.json())
+                .then(variables => {
+                    const container = document.getElementById('variable-list');
+                    
+                    if (Object.keys(variables).length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">[No Data]</div>
+                                <p>No custom variables yet. Create your first one!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    const html = Object.entries(variables).map(([name, config]) => {
+                        const scalingInfo = config.scaling && config.scaling.enabled 
+                            ? `${config.scaling.scaled_min} to ${config.scaling.scaled_max} ${config.scaling.unit || ''}`
+                            : 'No scaling';
+                        
+                        return `
+                            <div class="variable-card">
+                                <div class="variable-header">
+                                    <span class="variable-name">${name}</span>
+                                    <div class="variable-actions">
+                                        <button class="btn" onclick='showEditModal("${name}", ${JSON.stringify(config).replace(/'/g, "&apos;")})'>Edit</button>
+                                        <button class="btn danger" onclick="deleteVariable('${name}')">Delete</button>
+                                    </div>
+                                </div>
+                                ${config.description ? `<p style="color: #666; font-size: 14px;">${config.description}</p>` : ''}
+                                <div class="variable-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Type</span>
+                                        <span class="detail-value">${config.register_type.replace('_', ' ')}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Address</span>
+                                        <span class="detail-value">${config.address}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Data Type</span>
+                                        <span class="detail-value">${config.data_type.toUpperCase()}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Scaling</span>
+                                        <span class="detail-value">${scalingInfo}</span>
+                                    </div>
+                                </div>
+                                ${config.tags && config.tags.length > 0 ? `
+                                    <div style="margin-top: 10px;">
+                                        ${config.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    container.innerHTML = html;
+                });
+        }
+
+        function exportVariables() {
+            fetch('/api/custom_variables')
+                .then(response => response.json())
+                .then(variables => {
+                    const blob = new Blob([JSON.stringify(variables, null, 2)], {type: 'application/json'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `custom_variables_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+        }
+
+        function importVariables(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const variables = JSON.parse(e.target.result);
+                    
+                    const promises = Object.entries(variables).map(([name, config]) => {
+                        return fetch('/api/custom_variables', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({name: name, config: config})
+                        });
+                    });
+                    
+                    Promise.all(promises).then(() => {
+                        alert('Variables imported successfully!');
+                        loadVariables();
+                    });
+                } catch (error) {
+                    alert('Error importing variables: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        loadVariables();
+    </script>
+</body>
+</html>
