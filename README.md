@@ -1,6 +1,6 @@
 # SCADA IED Simulator
 
-A professional-grade Modbus TCP server simulator designed for power system engineers. This system provides a comprehensive simulation environment for Intelligent Electronic Devices (IEDs) commonly used in electrical substations, generation facilities, and industrial power systems.
+A professional-grade Modbus TCP server simulator designed for power engineers. This system provides a comprehensive simulation environment for Intelligent Electronic Devices (IEDs) commonly used in electrical substations, generation facilities, and industrial power systems.
 
 ## Overview
 
