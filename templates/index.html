@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>IED Simulator - Dashboard</title>
+    <title>Power IED Simulator - Dashboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -46,6 +46,7 @@
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .nav-btn {
@@ -75,7 +76,7 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -89,14 +90,14 @@
         
         .stat-label {
             color: #666;
-            font-size: 14px;
+            font-size: 12px;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .stat-value {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 600;
             color: #1a365d;
         }
@@ -107,6 +108,10 @@
         
         .stat-value.info {
             color: #2b6cb0;
+        }
+        
+        .stat-value.warning {
+            color: #c05621;
         }
         
         .section {
@@ -123,11 +128,21 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #1a365d;
             font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .section h3 {
+            color: #2d3748;
+            margin: 20px 0 15px 0;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .connection-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -140,7 +155,7 @@
         }
         
         .info-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -148,50 +163,187 @@
         }
         
         .info-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #1a365d;
             font-family: 'Courier New', monospace;
         }
         
-        .register-grid {
+        /* Power Measurements Grid */
+        .power-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .power-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #1a365d;
+        }
+        
+        .power-card.voltage { border-left-color: #e53e3e; }
+        .power-card.current { border-left-color: #38a169; }
+        .power-card.power { border-left-color: #3182ce; }
+        .power-card.frequency { border-left-color: #805ad5; }
+        .power-card.transformer { border-left-color: #d69e2e; }
+        .power-card.breaker { border-left-color: #dd6b20; }
+        .power-card.protection { border-left-color: #e53e3e; }
+        .power-card.generator { border-left-color: #319795; }
+        
+        .power-card h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .power-card h4 .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .measurement-item {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .measurement-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .measurement-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a365d;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .measurement-unit {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 2px;
+        }
+        
+        /* Status Indicators */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
         }
         
-        .register-item {
+        .status-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f7fafc;
+            border-radius: 4px;
+            gap: 12px;
+        }
+        
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .status-on {
+            background: #48bb78;
+            box-shadow: 0 0 8px rgba(72, 187, 120, 0.5);
+        }
+        
+        .status-off {
+            background: #a0aec0;
+        }
+        
+        .status-alarm {
+            background: #f56565;
+            animation: pulse-alarm 1s infinite;
+        }
+        
+        @keyframes pulse-alarm {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2d3748;
+            flex: 1;
+        }
+        
+        .status-value {
+            font-size: 12px;
+            color: #718096;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Controls Section */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .control-item {
             display: flex;
             align-items: center;
             padding: 15px;
             background: #f7fafc;
             border-radius: 4px;
-            transition: background 0.2s;
+            gap: 15px;
         }
         
-        .register-item:hover {
-            background: #edf2f7;
-        }
-        
-        .register-name {
+        .control-name {
             flex: 1;
+        }
+        
+        .control-name .label {
+            font-size: 13px;
             font-weight: 600;
             color: #2d3748;
         }
         
-        .register-value {
-            min-width: 80px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            font-weight: bold;
-            color: #1a365d;
-            margin: 0 15px;
+        .control-name .address {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 2px;
         }
         
-        .register-controls {
+        .control-value {
+            min-width: 60px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        
+        .control-buttons {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 8px;
         }
         
         input[type="number"] {
@@ -216,6 +368,7 @@
             cursor: pointer;
             font-weight: 500;
             transition: background 0.2s;
+            font-size: 13px;
         }
         
         button:hover {
@@ -223,7 +376,7 @@
         }
         
         .toggle-btn {
-            min-width: 80px;
+            min-width: 70px;
             background: #276749;
         }
         
@@ -235,26 +388,9 @@
             background: #c53030;
         }
         
-        .status-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-left: 10px;
-            border: 2px solid #cbd5e0;
-        }
-        
-        .status-on {
-            background: #48bb78;
-            border-color: #276749;
-        }
-        
-        .status-off {
-            background: #a0aec0;
-            border-color: #718096;
-        }
-        
+        /* Activity Log */
         .activity-log {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             background: #f7fafc;
             padding: 15px;
@@ -264,37 +400,112 @@
         }
         
         .activity-item {
-            padding: 8px;
-            margin-bottom: 5px;
+            padding: 10px;
+            margin-bottom: 8px;
             background: white;
             border-radius: 4px;
             border-left: 3px solid #1a365d;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
         }
         
-        .timestamp {
+        .activity-item .timestamp {
             color: #666;
-            margin-right: 10px;
+            font-size: 11px;
         }
         
-        .change-type {
+        .activity-item .change-type {
             font-weight: bold;
             color: #1a365d;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        .activity-item .change-name {
+            color: #2d3748;
+            font-weight: 500;
+        }
+        
+        .activity-item .change-values {
+            color: #718096;
+        }
+        
+        /* Tabs */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            background: transparent;
+            color: #718096;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn:hover {
+            color: #1a365d;
+            background: #f7fafc;
+        }
+        
+        .tab-btn.active {
+            color: #1a365d;
+            border-bottom-color: #1a365d;
+            background: transparent;
+        }
+        
+        .tab-content {
+            display: none;
+            padding-top: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .measurement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>SCADA IED Simulator - Dashboard</h1>
-            <p>Real-time monitoring and control interface for Modbus TCP simulation</p>
+            <h1>⚡ Power Industry IED Simulator - Dashboard</h1>
+            <p>Professional Modbus TCP Server for SCADA Testing and Development</p>
             <div class="nav-buttons">
                 <a href="/" class="nav-btn">Dashboard</a>
                 <a href="/simulation" class="nav-btn">Live Simulation</a>
                 <a href="/variables" class="nav-btn">Custom Variables</a>
                 <button class="nav-btn secondary" onclick="exportConfig()">Export Config</button>
+                <button class="nav-btn secondary" onclick="resetDefaults()">Reset Defaults</button>
             </div>
         </header>
 
+        <!-- System Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">System Uptime</div>
@@ -309,11 +520,16 @@
                 <div class="stat-value success" id="modbus-status">Running</div>
             </div>
             <div class="stat-card">
+                <div class="stat-label">Register Count</div>
+                <div class="stat-value" id="register-count">500</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-label">Last Request</div>
                 <div class="stat-value" id="last-request">Never</div>
             </div>
         </div>
 
+        <!-- Connection Information -->
         <div class="section">
             <h2>Connection Information</h2>
             <div class="connection-info">
@@ -333,101 +549,545 @@
                     <div class="info-label">Unit ID</div>
                     <div class="info-value" id="unit-id">254</div>
                 </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Coils (Digital Outputs - Read/Write)</h2>
-            <div class="register-grid">
-                <div class="register-item">
-                    <span class="register-name">COIL_00000 (Address: 0)</span>
-                    <span class="register-value" id="coil-0">0</span>
-                    <span class="status-indicator status-off" id="coil-0-led"></span>
-                    <div class="register-controls">
-                        <button class="toggle-btn" onclick="toggleCoil(0)">Toggle</button>
-                    </div>
+                <div class="info-item">
+                    <div class="info-label">Input Registers</div>
+                    <div class="info-value">85+ vars</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Holding Registers</div>
+                    <div class="info-value">50+ vars</div>
                 </div>
             </div>
         </div>
 
+        <!-- Real-Time Measurements -->
         <div class="section">
-            <h2>Discrete Inputs (Digital Inputs - Read Only)</h2>
-            <div class="register-grid">
-                <div class="register-item">
-                    <span class="register-name">DI_00000 (Address: 0)</span>
-                    <span class="register-value" id="di-0">0</span>
-                    <span class="status-indicator status-off" id="di-0-led"></span>
-                    <div class="register-controls">
-                        <button class="toggle-btn" onclick="toggleDiscreteInput(0)">Toggle</button>
+            <h2>Real-Time Measurements</h2>
+            <div class="power-grid">
+                <!-- Voltage Card -->
+                <div class="power-card voltage">
+                    <h4><span class="icon" style="background:#fed7d7;color:#c53030;">V</span> Voltage Measurements</h4>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L1-N</div>
+                            <div class="measurement-value" id="v-l1-n">120.0</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L2-N</div>
+                            <div class="measurement-value" id="v-l2-n">120.0</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L3-N</div>
+                            <div class="measurement-value" id="v-l3-n">120.0</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L1-L2</div>
+                            <div class="measurement-value" id="v-l1-l2">207.8</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L2-L3</div>
+                            <div class="measurement-value" id="v-l2-l3">207.8</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">V L3-L1</div>
+                            <div class="measurement-value" id="v-l3-l1">207.8</div>
+                            <div class="measurement-unit">V</div>
+                        </div>
                     </div>
                 </div>
-                <div class="register-item">
-                    <span class="register-name">DI_00001 (Address: 1)</span>
-                    <span class="register-value" id="di-1">0</span>
-                    <span class="status-indicator status-off" id="di-1-led"></span>
-                    <div class="register-controls">
-                        <button class="toggle-btn" onclick="toggleDiscreteInput(1)">Toggle</button>
+
+                <!-- Current Card -->
+                <div class="power-card current">
+                    <h4><span class="icon" style="background:#c6f6d5;color:#276749;">I</span> Current Measurements</h4>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">
+                            <div class="measurement-label">I L1</div>
+                            <div class="measurement-value" id="i-l1">100.0</div>
+                            <div class="measurement-unit">A</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">I L2</div>
+                            <div class="measurement-value" id="i-l2">100.0</div>
+                            <div class="measurement-unit">A</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">I L3</div>
+                            <div class="measurement-value" id="i-l3">100.0</div>
+                            <div class="measurement-unit">A</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">I Neutral</div>
+                            <div class="measurement-value" id="i-n">1.0</div>
+                            <div class="measurement-unit">A</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Power Card -->
+                <div class="power-card power">
+                    <h4><span class="icon" style="background:#bee3f8;color:#2b6cb0;">P</span> Power Measurements</h4>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">
+                            <div class="measurement-label">P Total</div>
+                            <div class="measurement-value" id="p-total">120.0</div>
+                            <div class="measurement-unit">kW</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">Q Total</div>
+                            <div class="measurement-value" id="q-total">30.0</div>
+                            <div class="measurement-unit">kVAR</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">S Total</div>
+                            <div class="measurement-value" id="s-total">123.7</div>
+                            <div class="measurement-unit">kVA</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">PF Total</div>
+                            <div class="measurement-value" id="pf-total">0.970</div>
+                            <div class="measurement-unit"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frequency Card -->
+                <div class="power-card frequency">
+                    <h4><span class="icon" style="background:#e9d8fd;color:#6b46c1;">f</span> Frequency</h4>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">
+                            <div class="measurement-label">Frequency</div>
+                            <div class="measurement-value" id="freq">60.00</div>
+                            <div class="measurement-unit">Hz</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transformer Card -->
+                <div class="power-card transformer">
+                    <h4><span class="icon" style="background:#fefcbf;color:#975a16;">T</span> Transformer</h4>
+                    <div class="measurement-grid">
+                        <div class="measurement-item">
+                            <div class="measurement-label">Oil Temp</div>
+                            <div class="measurement-value" id="xfmr-oil-temp">45.0</div>
+                            <div class="measurement-unit">°C</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">Winding Temp</div>
+                            <div class="measurement-value" id="xfmr-wndg-temp">55.0</div>
+                            <div class="measurement-unit">°C</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">Load</div>
+                            <div class="measurement-value" id="xfmr-load">65.0</div>
+                            <div class="measurement-unit">%</div>
+                        </div>
+                        <div class="measurement-item">
+                            <div class="measurement-label">Tap Position</div>
+                            <div class="measurement-value" id="xfmr-tap">8</div>
+                            <div class="measurement-unit"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Tabbed Status/Control Section -->
         <div class="section">
-            <h2>Holding Registers (Analog Outputs - Read/Write)</h2>
-            <div class="register-grid">
-                <div class="register-item">
-                    <span class="register-name">SIM_AO_00 (Address: 0)</span>
-                    <span class="register-value" id="hr-0">0</span>
-                    <div class="register-controls">
-                        <input type="number" id="hr-0-input" value="0" min="-32768" max="32767">
-                        <button onclick="setHoldingRegister(0)">Set</button>
+            <h2>Equipment Status & Controls</h2>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('breaker-tab')">Breaker</button>
+                    <button class="tab-btn" onclick="showTab('protection-tab')">Protection</button>
+                    <button class="tab-btn" onclick="showTab('transformer-tab')">Transformer</button>
+                    <button class="tab-btn" onclick="showTab('generator-tab')">Generator</button>
+                    <button class="tab-btn" onclick="showTab('capacitor-tab')">Capacitor Bank</button>
+                    <button class="tab-btn" onclick="showTab('dc-tab')">DC System</button>
+                </div>
+
+                <!-- Breaker Tab -->
+                <div id="breaker-tab" class="tab-content active">
+                    <h3>Breaker Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="bkr-52a-led"></div>
+                            <span class="status-name">52A (Closed)</span>
+                            <span class="status-value" id="bkr-52a">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="bkr-52b-led"></div>
+                            <span class="status-name">52B (Open)</span>
+                            <span class="status-value" id="bkr-52b">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="bkr-ready-led"></div>
+                            <span class="status-name">Breaker Ready</span>
+                            <span class="status-value" id="bkr-ready">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="bkr-spring-led"></div>
+                            <span class="status-name">Spring Charged</span>
+                            <span class="status-value" id="bkr-spring">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="bkr-lockout-led"></div>
+                            <span class="status-name">Lockout</span>
+                            <span class="status-value" id="bkr-lockout">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="bkr-remote-led"></div>
+                            <span class="status-name">Remote Mode</span>
+                            <span class="status-value" id="bkr-remote">1</span>
+                        </div>
+                    </div>
+                    <h3>Breaker Controls</h3>
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Close Command</div>
+                                <div class="address">Coil 0</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(0)">CLOSE</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Trip Command</div>
+                                <div class="address">Coil 1</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(1)">TRIP</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Reset Lockout</div>
+                                <div class="address">Coil 3</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(3)">RESET</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Protection Tab -->
+                <div id="protection-tab" class="tab-content">
+                    <h3>Protection Element Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="prot-enabled-led"></div>
+                            <span class="status-name">Protection Enabled</span>
+                            <span class="status-value" id="prot-enabled">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-50-pickup-led"></div>
+                            <span class="status-name">50 Inst OC Pickup</span>
+                            <span class="status-value" id="prot-50-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-51-pickup-led"></div>
+                            <span class="status-name">51 TOC Pickup</span>
+                            <span class="status-value" id="prot-51-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-50n-pickup-led"></div>
+                            <span class="status-name">50N Ground Inst Pickup</span>
+                            <span class="status-value" id="prot-50n-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-27-pickup-led"></div>
+                            <span class="status-name">27 UV Pickup</span>
+                            <span class="status-value" id="prot-27-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-59-pickup-led"></div>
+                            <span class="status-name">59 OV Pickup</span>
+                            <span class="status-value" id="prot-59-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-81u-pickup-led"></div>
+                            <span class="status-name">81U UF Pickup</span>
+                            <span class="status-value" id="prot-81u-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-81o-pickup-led"></div>
+                            <span class="status-name">81O OF Pickup</span>
+                            <span class="status-value" id="prot-81o-pickup">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="prot-lockout-led"></div>
+                            <span class="status-name">Protection Lockout</span>
+                            <span class="status-value" id="prot-lockout">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="prot-recl-enabled-led"></div>
+                            <span class="status-name">Recloser Enabled</span>
+                            <span class="status-value" id="prot-recl-enabled">1</span>
+                        </div>
+                    </div>
+                    <h3>Protection Controls</h3>
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Enable Protection</div>
+                                <div class="address">Coil 20</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(20)">ENABLE</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Reset Targets</div>
+                                <div class="address">Coil 25</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(25)">RESET</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transformer Tab -->
+                <div id="transformer-tab" class="tab-content">
+                    <h3>Transformer Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="xfmr-online-led"></div>
+                            <span class="status-name">Transformer Online</span>
+                            <span class="status-value" id="xfmr-online">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="xfmr-oil-temp-alm-led"></div>
+                            <span class="status-name">Oil Temp Alarm</span>
+                            <span class="status-value" id="xfmr-oil-temp-alm">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="xfmr-wndg-temp-alm-led"></div>
+                            <span class="status-name">Winding Temp Alarm</span>
+                            <span class="status-value" id="xfmr-wndg-temp-alm">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="xfmr-fan1-led"></div>
+                            <span class="status-name">Fan 1 Running</span>
+                            <span class="status-value" id="xfmr-fan1">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="xfmr-fan2-led"></div>
+                            <span class="status-name">Fan 2 Running</span>
+                            <span class="status-value" id="xfmr-fan2">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="xfmr-tap-auto-led"></div>
+                            <span class="status-name">Tap Auto Mode</span>
+                            <span class="status-value" id="xfmr-tap-auto">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="xfmr-buchholz-led"></div>
+                            <span class="status-name">Buchholz Alarm</span>
+                            <span class="status-value" id="xfmr-buchholz">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="xfmr-dga-led"></div>
+                            <span class="status-name">DGA Alarm</span>
+                            <span class="status-value" id="xfmr-dga">0</span>
+                        </div>
+                    </div>
+                    <h3>Tap Changer Controls</h3>
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Tap Raise</div>
+                                <div class="address">Coil 40</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(40)">RAISE</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Tap Lower</div>
+                                <div class="address">Coil 41</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(41)">LOWER</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Auto Mode</div>
+                                <div class="address">Coil 42</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(42)">AUTO</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generator Tab -->
+                <div id="generator-tab" class="tab-content">
+                    <h3>Generator Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="gen-online-led"></div>
+                            <span class="status-name">Generator Online</span>
+                            <span class="status-value" id="gen-online">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="gen-sync-led"></div>
+                            <span class="status-name">Sync Check OK</span>
+                            <span class="status-value" id="gen-sync">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="gen-exciter-led"></div>
+                            <span class="status-name">Exciter On</span>
+                            <span class="status-value" id="gen-exciter">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="gen-avr-led"></div>
+                            <span class="status-name">AVR Auto Mode</span>
+                            <span class="status-value" id="gen-avr">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="gen-gov-led"></div>
+                            <span class="status-name">Governor Auto Mode</span>
+                            <span class="status-value" id="gen-gov">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="gen-vibration-led"></div>
+                            <span class="status-name">Vibration Alarm</span>
+                            <span class="status-value" id="gen-vibration">0</span>
+                        </div>
+                    </div>
+                    <h3>Generator Controls</h3>
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Start Generator</div>
+                                <div class="address">Coil 80</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(80)">START</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Stop Generator</div>
+                                <div class="address">Coil 81</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(81)">STOP</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Initiate Sync</div>
+                                <div class="address">Coil 82</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(82)">SYNC</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Capacitor Bank Tab -->
+                <div id="capacitor-tab" class="tab-content">
+                    <h3>Capacitor Bank Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="cap-step1-led"></div>
+                            <span class="status-name">Step 1 On</span>
+                            <span class="status-value" id="cap-step1">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="cap-step2-led"></div>
+                            <span class="status-name">Step 2 On</span>
+                            <span class="status-value" id="cap-step2">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="cap-step3-led"></div>
+                            <span class="status-name">Step 3 On</span>
+                            <span class="status-value" id="cap-step3">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="cap-step4-led"></div>
+                            <span class="status-name">Step 4 On</span>
+                            <span class="status-value" id="cap-step4">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="cap-step5-led"></div>
+                            <span class="status-name">Step 5 On</span>
+                            <span class="status-value" id="cap-step5">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="cap-auto-led"></div>
+                            <span class="status-name">Auto Mode</span>
+                            <span class="status-value" id="cap-auto">1</span>
+                        </div>
+                    </div>
+                    <h3>Capacitor Bank Controls</h3>
+                    <div class="control-grid">
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">All Steps On</div>
+                                <div class="address">Coil 70</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(70)">ALL ON</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">All Steps Off</div>
+                                <div class="address">Coil 71</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(71)">ALL OFF</button>
+                        </div>
+                        <div class="control-item">
+                            <div class="control-name">
+                                <div class="label">Auto Mode</div>
+                                <div class="address">Coil 72</div>
+                            </div>
+                            <button class="toggle-btn" onclick="pulseCoil(72)">AUTO</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DC System Tab -->
+                <div id="dc-tab" class="tab-content">
+                    <h3>DC System Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator" id="dc-charger-led"></div>
+                            <span class="status-name">Charger On</span>
+                            <span class="status-value" id="dc-charger">1</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="dc-charger-fault-led"></div>
+                            <span class="status-name">Charger Fault</span>
+                            <span class="status-value" id="dc-charger-fault">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator status-off" id="dc-gnd-fault-led"></div>
+                            <span class="status-name">Ground Fault</span>
+                            <span class="status-value" id="dc-gnd-fault">0</span>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator" id="dc-float-led"></div>
+                            <span class="status-name">Float Mode</span>
+                            <span class="status-value" id="dc-float">1</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Recent Activity -->
         <div class="section">
-            <h2>Input Registers (Analog Inputs - Read Only)</h2>
-            <div class="register-grid">
-                <div class="register-item">
-                    <span class="register-name">SIM_AI_00 (Address: 0)</span>
-                    <span class="register-value" id="ir-0">100</span>
-                    <div class="register-controls">
-                        <input type="number" id="ir-0-input" value="100" min="-32768" max="32767">
-                        <button onclick="setInputRegister(0)">Set</button>
-                    </div>
-                </div>
-                <div class="register-item">
-                    <span class="register-name">SIM_AI_01 (Address: 1)</span>
-                    <span class="register-value" id="ir-1">200</span>
-                    <div class="register-controls">
-                        <input type="number" id="ir-1-input" value="200" min="-32768" max="32767">
-                        <button onclick="setInputRegister(1)">Set</button>
-                    </div>
-                </div>
-                <div class="register-item">
-                    <span class="register-name">IREG_00002 (Address: 2)</span>
-                    <span class="register-value" id="ir-2">0</span>
-                    <div class="register-controls">
-                        <input type="number" id="ir-2-input" value="0" min="-32768" max="32767">
-                        <button onclick="setInputRegister(2)">Set</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Recent Activity</h2>
+            <h2>Recent Activity Log</h2>
             <div class="activity-log" id="activity-log">
                 <div class="activity-item">
                     <span class="timestamp">System started</span>
-                    <span class="change-type">No activity yet</span>
+                    <span class="change-type">INFO</span>
+                    <span class="change-name">No activity yet</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Tab functionality
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
         function updateSystemStatus() {
             fetch('/api/system_status')
                 .then(response => response.json())
@@ -442,25 +1102,28 @@
                     document.getElementById('total-requests').textContent = data.system.total_requests;
                     document.getElementById('modbus-status').textContent = 
                         data.system.modbus_running ? 'Running' : 'Stopped';
+                    document.getElementById('register-count').textContent = data.register_count || 500;
                     
                     if (data.system.last_request) {
                         const lastReq = new Date(data.system.last_request);
-                        document.getElementById('last-request').textContent = 
-                            lastReq.toLocaleTimeString();
+                        document.getElementById('last-request').textContent = lastReq.toLocaleTimeString();
                     }
                     
                     document.getElementById('server-ip').textContent = data.modbus.ip;
                     document.getElementById('server-port').textContent = data.modbus.port;
                     document.getElementById('unit-id').textContent = data.modbus.address;
                     
+                    // Update activity log
                     if (data.recent_changes && data.recent_changes.length > 0) {
-                        const logHtml = data.recent_changes.reverse().map(change => {
+                        const logHtml = data.recent_changes.slice().reverse().map(change => {
                             const time = new Date(change.timestamp).toLocaleTimeString();
+                            const name = change.name || `Addr ${change.address}`;
                             return `
                                 <div class="activity-item">
                                     <span class="timestamp">${time}</span>
                                     <span class="change-type">${change.type}</span>
-                                    Address ${change.address}: ${change.old_value} -> ${change.new_value}
+                                    <span class="change-name">${name}</span>
+                                    <span class="change-values">${change.old_value} → ${change.new_value}</span>
                                 </div>
                             `;
                         }).join('');
@@ -473,82 +1136,126 @@
             fetch('/api/status')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('coil-0').textContent = data.coils.COIL_00000;
-                    updateLED('coil-0-led', data.coils.COIL_00000);
+                    // Update voltage measurements
+                    document.getElementById('v-l1-n').textContent = data.voltage.V_L1_N.toFixed(1);
+                    document.getElementById('v-l2-n').textContent = data.voltage.V_L2_N.toFixed(1);
+                    document.getElementById('v-l3-n').textContent = data.voltage.V_L3_N.toFixed(1);
+                    document.getElementById('v-l1-l2').textContent = data.voltage.V_L1_L2.toFixed(1);
+                    document.getElementById('v-l2-l3').textContent = data.voltage.V_L2_L3.toFixed(1);
+                    document.getElementById('v-l3-l1').textContent = data.voltage.V_L3_L1.toFixed(1);
                     
-                    document.getElementById('di-0').textContent = data.discrete_inputs.DI_00000;
-                    updateLED('di-0-led', data.discrete_inputs.DI_00000);
-                    document.getElementById('di-1').textContent = data.discrete_inputs.DI_00001;
-                    updateLED('di-1-led', data.discrete_inputs.DI_00001);
+                    // Update current measurements
+                    document.getElementById('i-l1').textContent = data.current.I_L1.toFixed(1);
+                    document.getElementById('i-l2').textContent = data.current.I_L2.toFixed(1);
+                    document.getElementById('i-l3').textContent = data.current.I_L3.toFixed(1);
+                    document.getElementById('i-n').textContent = data.current.I_N.toFixed(1);
                     
-                    document.getElementById('hr-0').textContent = data.holding_registers.HR_00000;
+                    // Update power measurements
+                    document.getElementById('p-total').textContent = data.power.P_TOTAL.toFixed(1);
+                    document.getElementById('q-total').textContent = data.power.Q_TOTAL.toFixed(1);
+                    document.getElementById('s-total').textContent = data.power.S_TOTAL.toFixed(1);
+                    document.getElementById('pf-total').textContent = data.power.PF_TOTAL.toFixed(3);
                     
-                    document.getElementById('ir-0').textContent = data.input_registers.IR_00000;
-                    document.getElementById('ir-1').textContent = data.input_registers.IR_00001;
-                    document.getElementById('ir-2').textContent = data.input_registers.IR_00002;
+                    // Update frequency
+                    document.getElementById('freq').textContent = data.frequency.FREQ.toFixed(2);
+                    
+                    // Update transformer
+                    document.getElementById('xfmr-oil-temp').textContent = data.transformer.XFMR_OIL_TEMP.toFixed(1);
+                    document.getElementById('xfmr-wndg-temp').textContent = data.transformer.XFMR_WNDG_TEMP.toFixed(1);
+                    document.getElementById('xfmr-load').textContent = data.transformer.XFMR_LOAD_PCT.toFixed(1);
+                    document.getElementById('xfmr-tap').textContent = data.transformer.XFMR_TAP_POS;
+                    
+                    // Update breaker status
+                    updateLED('bkr-52a-led', data.breaker.BKR_52A);
+                    updateLED('bkr-52b-led', data.breaker.BKR_52B);
+                    updateLED('bkr-ready-led', data.breaker.BKR_READY);
+                });
+            
+            // Update discrete inputs for status displays
+            fetch('/api/category/discrete_inputs')
+                .then(response => response.json())
+                .then(data => {
+                    // Breaker status
+                    updateLED('bkr-spring-led', data.BKR_SPRING_CHRG?.value);
+                    updateLED('bkr-lockout-led', data.BKR_LOCKOUT?.value, true);
+                    updateLED('bkr-remote-led', data.BKR_REMOTE?.value);
+                    
+                    // Protection status
+                    updateLED('prot-enabled-led', data.PROT_ENABLED?.value);
+                    updateLED('prot-50-pickup-led', data.PROT_50_PICKUP?.value, true);
+                    updateLED('prot-51-pickup-led', data.PROT_51_PICKUP?.value, true);
+                    updateLED('prot-50n-pickup-led', data.PROT_50N_PICKUP?.value, true);
+                    updateLED('prot-27-pickup-led', data.PROT_27_PICKUP?.value, true);
+                    updateLED('prot-59-pickup-led', data.PROT_59_PICKUP?.value, true);
+                    updateLED('prot-81u-pickup-led', data.PROT_81U_PICKUP?.value, true);
+                    updateLED('prot-81o-pickup-led', data.PROT_81O_PICKUP?.value, true);
+                    updateLED('prot-lockout-led', data.PROT_LOCKOUT?.value, true);
+                    updateLED('prot-recl-enabled-led', data.PROT_RECL_ENABLED?.value);
+                    
+                    // Transformer status
+                    updateLED('xfmr-online-led', data.XFMR_ONLINE?.value);
+                    updateLED('xfmr-oil-temp-alm-led', data.XFMR_OIL_TEMP_ALM?.value, true);
+                    updateLED('xfmr-wndg-temp-alm-led', data.XFMR_WNDG_TEMP_ALM?.value, true);
+                    updateLED('xfmr-fan1-led', data.XFMR_FAN1_RUN?.value);
+                    updateLED('xfmr-fan2-led', data.XFMR_FAN2_RUN?.value);
+                    updateLED('xfmr-tap-auto-led', data.XFMR_TAP_AUTO?.value);
+                    updateLED('xfmr-buchholz-led', data.XFMR_BUCHHOLZ_ALM?.value, true);
+                    updateLED('xfmr-dga-led', data.XFMR_DGA_ALARM?.value, true);
+                    
+                    // Generator status
+                    updateLED('gen-online-led', data.GEN_ONLINE?.value);
+                    updateLED('gen-sync-led', data.GEN_SYNC_CHECK?.value);
+                    updateLED('gen-exciter-led', data.GEN_EXCITER_ON?.value);
+                    updateLED('gen-avr-led', data.GEN_AVR_AUTO?.value);
+                    updateLED('gen-gov-led', data.GEN_GOV_AUTO?.value);
+                    updateLED('gen-vibration-led', data.GEN_VIBRATION_ALM?.value, true);
+                    
+                    // Capacitor bank status
+                    updateLED('cap-step1-led', data.CAP_STEP1_ON?.value);
+                    updateLED('cap-step2-led', data.CAP_STEP2_ON?.value);
+                    updateLED('cap-step3-led', data.CAP_STEP3_ON?.value);
+                    updateLED('cap-step4-led', data.CAP_STEP4_ON?.value);
+                    updateLED('cap-step5-led', data.CAP_STEP5_ON?.value);
+                    updateLED('cap-auto-led', data.CAP_AUTO_MODE?.value);
+                    
+                    // DC system status
+                    updateLED('dc-charger-led', data.DC_CHARGER_ON?.value);
+                    updateLED('dc-charger-fault-led', data.DC_CHARGER_FAULT?.value, true);
+                    updateLED('dc-gnd-fault-led', data.DC_GND_FAULT?.value, true);
+                    updateLED('dc-float-led', data.DC_FLOAT_MODE?.value);
                 });
         }
 
-        function updateLED(elementId, value) {
+        function updateLED(elementId, value, isAlarm = false) {
             const led = document.getElementById(elementId);
+            if (!led) return;
+            
+            led.classList.remove('status-on', 'status-off', 'status-alarm');
+            
             if (value) {
-                led.classList.remove('status-off');
-                led.classList.add('status-on');
+                if (isAlarm) {
+                    led.classList.add('status-alarm');
+                } else {
+                    led.classList.add('status-on');
+                }
             } else {
-                led.classList.remove('status-on');
                 led.classList.add('status-off');
             }
         }
 
-        function toggleCoil(address) {
-            const currentValue = parseInt(document.getElementById(`coil-${address}`).textContent);
-            const newValue = currentValue ? 0 : 1;
-            
+        function pulseCoil(address) {
             fetch('/api/set_coil', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({address: address, value: newValue})
+                body: JSON.stringify({address: address, value: 1})
             }).then(() => {
-                updateStatus();
-                updateSystemStatus();
-            });
-        }
-
-        function toggleDiscreteInput(address) {
-            const currentValue = parseInt(document.getElementById(`di-${address}`).textContent);
-            const newValue = currentValue ? 0 : 1;
-            
-            fetch('/api/set_discrete_input', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({address: address, value: newValue})
-            }).then(() => {
-                updateStatus();
-                updateSystemStatus();
-            });
-        }
-
-        function setHoldingRegister(address) {
-            const value = parseInt(document.getElementById(`hr-${address}-input`).value);
-            
-            fetch('/api/set_holding_register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({address: address, value: value})
-            }).then(() => {
-                updateStatus();
-                updateSystemStatus();
-            });
-        }
-
-        function setInputRegister(address) {
-            const value = parseInt(document.getElementById(`ir-${address}-input`).value);
-            
-            fetch('/api/set_input_register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({address: address, value: value})
-            }).then(() => {
+                setTimeout(() => {
+                    fetch('/api/set_coil', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: address, value: 0})
+                    });
+                }, 500);
                 updateStatus();
                 updateSystemStatus();
             });
@@ -562,7 +1269,7 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `scada_config_${new Date().toISOString().split('T')[0]}.json`;
+                    a.download = `power_ied_config_${new Date().toISOString().split('T')[0]}.json`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -570,6 +1277,21 @@
                 });
         }
 
+        function resetDefaults() {
+            if (confirm('Reset all registers to default power industry values?')) {
+                fetch('/api/reset_defaults', {method: 'POST'})
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('All registers reset to defaults');
+                            updateStatus();
+                            updateSystemStatus();
+                        }
+                    });
+            }
+        }
+
+        // Initial load and periodic updates
         setInterval(updateStatus, 1000);
         setInterval(updateSystemStatus, 1000);
         updateStatus();
