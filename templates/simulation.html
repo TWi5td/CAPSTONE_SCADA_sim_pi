@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live Data Simulation</title>
+    <title>Power System Live Simulation</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
@@ -46,6 +46,7 @@
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .nav-btn {
@@ -83,7 +84,7 @@
         
         .sim-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
             gap: 20px;
         }
         
@@ -101,6 +102,7 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
+            font-size: 16px;
         }
         
         .sim-controls {
@@ -110,7 +112,7 @@
         
         .control-group {
             display: grid;
-            grid-template-columns: 120px 1fr;
+            grid-template-columns: 130px 1fr;
             align-items: center;
             gap: 10px;
         }
@@ -118,7 +120,7 @@
         label {
             font-weight: 500;
             color: #4a5568;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         input[type="number"],
@@ -213,7 +215,7 @@
         
         .chart-container {
             width: 100%;
-            height: 200px;
+            height: 180px;
             background: white;
             border-radius: 4px;
             margin-top: 10px;
@@ -223,458 +225,786 @@
         }
         
         canvas {
-            width: 100%;
-            height: 100%;
+            display: block;
         }
-        
-        .pulse-sim-grid {
+
+        .pulse-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
-        
+
         .pulse-btn {
             padding: 15px;
-            background: #4a5568;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .pulse-btn:hover {
+            background: #cbd5e0;
+        }
+
+        .pulse-btn.active {
+            background: #48bb78;
             color: white;
-            border: none;
+            border-color: #38a169;
+        }
+
+        .preset-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .preset-section h3 {
+            color: #1a365d;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .preset-btn {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #1a365d;
+            color: #1a365d;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
         }
-        
-        .pulse-btn:hover {
-            background: #2d3748;
+
+        .preset-btn:hover {
+            background: #1a365d;
+            color: white;
         }
-        
-        .pulse-btn.active {
-            background: #276749;
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            color: #2c5282;
+            font-size: 13px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Live Data Simulation</h1>
-            <p>Generate realistic waveforms and patterns for testing</p>
+            <h1>Power System Live Simulation</h1>
+            <p>Simulate realistic power system behavior with voltage variations, load changes, frequency deviations, and equipment status</p>
             <div class="nav-buttons">
                 <a href="/" class="nav-btn">Dashboard</a>
-                <a href="/simulation" class="nav-btn">Live Simulation</a>
-                <a href="/variables" class="nav-btn">Custom Variables</a>
+                <a href="/variables" class="nav-btn">Register Map</a>
+                <button onclick="stopAllSimulations()" class="nav-btn stop">Stop All</button>
+                <button onclick="saveSimulationConfig()" class="nav-btn success">Save Config</button>
             </div>
         </header>
 
+        <!-- Voltage Simulation -->
         <div class="section">
-            <h2>Waveform Generators</h2>
+            <h2>📊 Voltage Simulation</h2>
             <div class="sim-grid">
-                <!-- Sine Wave Generator -->
                 <div class="sim-card">
-                    <h3>
-                        Sine Wave
-                        <span class="status-badge status-stopped" id="sine-status">Stopped</span>
-                    </h3>
+                    <h3>🔌 Three-Phase Voltage (L-N)</h3>
+                    <span id="voltage-status" class="status-badge status-stopped">Stopped</span>
+                    
                     <div class="sim-controls">
                         <div class="control-group">
-                            <label>Register:</label>
-                            <input type="number" id="sine-register" value="0" min="0" max="99">
+                            <label>Nominal Voltage:</label>
+                            <input type="number" id="voltage-nominal" value="120" step="1">
                         </div>
                         <div class="control-group">
-                            <label>Amplitude:</label>
-                            <input type="number" id="sine-amplitude" value="1000" min="1" max="32767">
+                            <label>Variation (±%):</label>
+                            <input type="number" id="voltage-variation" value="5" step="0.5" min="0" max="20">
                         </div>
                         <div class="control-group">
                             <label>Frequency (Hz):</label>
-                            <input type="number" id="sine-frequency" value="0.5" min="0.01" max="10" step="0.1">
+                            <input type="number" id="voltage-frequency" value="0.1" step="0.05" min="0.01" max="2">
                         </div>
                         <div class="control-group">
-                            <label>Offset:</label>
-                            <input type="number" id="sine-offset" value="0" min="-32768" max="32767">
+                            <label>Unbalance (%):</label>
+                            <input type="number" id="voltage-unbalance" value="1" step="0.5" min="0" max="5">
                         </div>
-                        <button class="btn" id="sine-start" onclick="toggleSineWave()">Start</button>
                     </div>
+                    
+                    <button id="voltage-start" class="btn" onclick="toggleVoltage()">Start</button>
+                    
                     <div class="preview">
-                        <div class="preview-label">Current Value:</div>
-                        <div class="preview-value" id="sine-value">0</div>
+                        <div class="preview-label">L1-N Voltage</div>
+                        <div id="voltage-l1-value" class="preview-value">120.0 V</div>
                     </div>
                     <div class="chart-container">
-                        <canvas id="sine-chart"></canvas>
+                        <canvas id="voltage-chart"></canvas>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> V_L1_N (addr 0), V_L2_N (addr 1), V_L3_N (addr 2), V_AVG_LN (addr 6), V_UNBAL (addr 8)</p>
                     </div>
                 </div>
 
-                <!-- Ramp Generator -->
                 <div class="sim-card">
-                    <h3>
-                        Ramp / Sawtooth
-                        <span class="status-badge status-stopped" id="ramp-status">Stopped</span>
-                    </h3>
+                    <h3>Line-Line Voltage</h3>
+                    <span id="voltage-ll-status" class="status-badge status-stopped">Stopped</span>
+                    
                     <div class="sim-controls">
                         <div class="control-group">
-                            <label>Register:</label>
-                            <input type="number" id="ramp-register" value="1" min="0" max="99">
+                            <label>Nominal Voltage:</label>
+                            <input type="number" id="voltage-ll-nominal" value="208" step="1">
                         </div>
                         <div class="control-group">
-                            <label>Min Value:</label>
-                            <input type="number" id="ramp-min" value="0" min="-32768" max="32767">
+                            <label>Variation (±%):</label>
+                            <input type="number" id="voltage-ll-variation" value="5" step="0.5" min="0" max="20">
                         </div>
-                        <div class="control-group">
-                            <label>Max Value:</label>
-                            <input type="number" id="ramp-max" value="1000" min="-32768" max="32767">
-                        </div>
-                        <div class="control-group">
-                            <label>Period (s):</label>
-                            <input type="number" id="ramp-period" value="10" min="1" max="300">
-                        </div>
-                        <button class="btn" id="ramp-start" onclick="toggleRamp()">Start</button>
                     </div>
+                    
+                    <button id="voltage-ll-start" class="btn" onclick="toggleVoltageLL()">Start</button>
+                    
                     <div class="preview">
-                        <div class="preview-label">Current Value:</div>
-                        <div class="preview-value" id="ramp-value">0</div>
+                        <div class="preview-label">L1-L2 Voltage</div>
+                        <div id="voltage-ll-value" class="preview-value">208.0 V</div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="ramp-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Random Walk Generator -->
-                <div class="sim-card">
-                    <h3>
-                        Random Walk
-                        <span class="status-badge status-stopped" id="random-status">Stopped</span>
-                    </h3>
-                    <div class="sim-controls">
-                        <div class="control-group">
-                            <label>Register:</label>
-                            <input type="number" id="random-register" value="2" min="0" max="99">
-                        </div>
-                        <div class="control-group">
-                            <label>Start Value:</label>
-                            <input type="number" id="random-start-value" value="500" min="-32768" max="32767">
-                        </div>
-                        <div class="control-group">
-                            <label>Step Size:</label>
-                            <input type="number" id="random-step" value="50" min="1" max="1000">
-                        </div>
-                        <div class="control-group">
-                            <label>Min/Max:</label>
-                            <div style="display: flex; gap: 5px;">
-                                <input type="number" id="random-min" value="0" min="-32768" max="32767" style="width: 50%;">
-                                <input type="number" id="random-max" value="1000" min="-32768" max="32767" style="width: 50%;">
-                            </div>
-                        </div>
-                        <button class="btn" id="random-start-btn" onclick="toggleRandom()">Start</button>
-                    </div>
-                    <div class="preview">
-                        <div class="preview-label">Current Value:</div>
-                        <div class="preview-value" id="random-value">500</div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="random-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Square Wave Generator -->
-                <div class="sim-card">
-                    <h3>
-                        Square Wave
-                        <span class="status-badge status-stopped" id="square-status">Stopped</span>
-                    </h3>
-                    <div class="sim-controls">
-                        <div class="control-group">
-                            <label>Register:</label>
-                            <input type="number" id="square-register" value="3" min="0" max="99">
-                        </div>
-                        <div class="control-group">
-                            <label>High Value:</label>
-                            <input type="number" id="square-high" value="1000" min="-32768" max="32767">
-                        </div>
-                        <div class="control-group">
-                            <label>Low Value:</label>
-                            <input type="number" id="square-low" value="0" min="-32768" max="32767">
-                        </div>
-                        <div class="control-group">
-                            <label>Period (s):</label>
-                            <input type="number" id="square-period" value="4" min="0.5" max="60" step="0.5">
-                        </div>
-                        <button class="btn" id="square-start" onclick="toggleSquareWave()">Start</button>
-                    </div>
-                    <div class="preview">
-                        <div class="preview-label">Current Value:</div>
-                        <div class="preview-value" id="square-value">0</div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="square-chart"></canvas>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> V_L1_L2 (addr 3), V_L2_L3 (addr 4), V_L3_L1 (addr 5), V_AVG_LL (addr 7)</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Current and Power Simulation -->
         <div class="section">
-            <h2>Digital Pulse Simulation</h2>
-            <p style="color: #666; margin-bottom: 15px;">Click to toggle discrete inputs (simulating breaker trips, alarms, etc.)</p>
-            <div class="pulse-sim-grid">
-                <button class="pulse-btn" id="pulse-0" onclick="togglePulse(0)">DI_00000</button>
-                <button class="pulse-btn" id="pulse-1" onclick="togglePulse(1)">DI_00001</button>
-                <button class="pulse-btn" id="pulse-2" onclick="togglePulse(2)">DI_00002</button>
-                <button class="pulse-btn" id="pulse-3" onclick="togglePulse(3)">DI_00003</button>
-                <button class="pulse-btn" id="pulse-4" onclick="togglePulse(4)">DI_00004</button>
-                <button class="pulse-btn" id="pulse-5" onclick="togglePulse(5)">DI_00005</button>
-                <button class="pulse-btn" id="pulse-6" onclick="togglePulse(6)">DI_00006</button>
-                <button class="pulse-btn" id="pulse-7" onclick="togglePulse(7)">DI_00007</button>
+            <h2>Current & Power Simulation</h2>
+            <div class="sim-grid">
+                <div class="sim-card">
+                    <h3>🔋 Three-Phase Current</h3>
+                    <span id="current-status" class="status-badge status-stopped">Stopped</span>
+                    
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Base Current (A):</label>
+                            <input type="number" id="current-base" value="100" step="5">
+                        </div>
+                        <div class="control-group">
+                            <label>Load Variation:</label>
+                            <select id="current-pattern">
+                                <option value="steady">Steady State</option>
+                                <option value="ramp">Ramping Load</option>
+                                <option value="cycle">Daily Cycle</option>
+                                <option value="random">Random Walk</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Unbalance (%):</label>
+                            <input type="number" id="current-unbalance" value="2" step="0.5" min="0" max="10">
+                        </div>
+                    </div>
+                    
+                    <button id="current-start" class="btn" onclick="toggleCurrent()">Start</button>
+                    
+                    <div class="preview">
+                        <div class="preview-label">L1 Current</div>
+                        <div id="current-value" class="preview-value">100.0 A</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="current-chart"></canvas>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> I_L1 (addr 20), I_L2 (addr 21), I_L3 (addr 22), I_AVG (addr 25), I_UNBAL (addr 26)</p>
+                    </div>
+                </div>
+
+                <div class="sim-card">
+                    <h3>Power Measurements</h3>
+                    <span id="power-status" class="status-badge status-stopped">Stopped</span>
+                    
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Active Power (kW):</label>
+                            <input type="number" id="power-active" value="120" step="10">
+                        </div>
+                        <div class="control-group">
+                            <label>Power Factor:</label>
+                            <input type="number" id="power-pf" value="0.95" step="0.01" min="0.7" max="1.0">
+                        </div>
+                        <div class="control-group">
+                            <label>Load Pattern:</label>
+                            <select id="power-pattern">
+                                <option value="steady">Steady</option>
+                                <option value="varying">Varying Load</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="power-start" class="btn" onclick="togglePower()">Start</button>
+                    
+                    <div class="preview">
+                        <div class="preview-label">Total Active Power</div>
+                        <div id="power-value" class="preview-value">120.0 kW</div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> P_TOTAL (addr 43), Q_TOTAL (addr 47), S_TOTAL (addr 51), PF_TOTAL (addr 55)</p>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Frequency Simulation -->
         <div class="section">
-            <h2>Simulation Control</h2>
-            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <button class="btn stop" onclick="stopAllSimulations()" style="width: auto;">Stop All Simulations</button>
-                <button class="btn success" onclick="saveSimulationConfig()" style="width: auto;">Save Configuration</button>
+            <h2>Frequency Simulation</h2>
+            <div class="sim-grid">
+                <div class="sim-card">
+                    <h3>System Frequency</h3>
+                    <span id="frequency-status" class="status-badge status-stopped">Stopped</span>
+                    
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Nominal (Hz):</label>
+                            <input type="number" id="frequency-nominal" value="60.00" step="0.01">
+                        </div>
+                        <div class="control-group">
+                            <label>Deviation (±Hz):</label>
+                            <input type="number" id="frequency-deviation" value="0.05" step="0.01" min="0" max="1">
+                        </div>
+                        <div class="control-group">
+                            <label>ROCOF (Hz/s):</label>
+                            <input type="number" id="frequency-rocof" value="0.1" step="0.05" min="0" max="2">
+                        </div>
+                        <div class="control-group">
+                            <label>Pattern:</label>
+                            <select id="frequency-pattern">
+                                <option value="stable">Stable</option>
+                                <option value="drift">Slow Drift</option>
+                                <option value="oscillate">Oscillating</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="frequency-start" class="btn" onclick="toggleFrequency()">Start</button>
+                    
+                    <div class="preview">
+                        <div class="preview-label">Frequency</div>
+                        <div id="frequency-value" class="preview-value">60.00 Hz</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="frequency-chart"></canvas>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> FREQ (addr 70), FREQ_DEV (addr 71), ROCOF (addr 72)</p>
+                    </div>
+                </div>
+
+                <div class="sim-card">
+                    <h3>Transformer Temperature</h3>
+                    <span id="temp-status" class="status-badge status-stopped">Stopped</span>
+                    
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label>Oil Temp (°C):</label>
+                            <input type="number" id="temp-oil" value="45" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label>Winding Temp (°C):</label>
+                            <input type="number" id="temp-winding" value="55" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label>Heating Rate:</label>
+                            <select id="temp-pattern">
+                                <option value="steady">Steady</option>
+                                <option value="heating">Heating Up</option>
+                                <option value="cooling">Cooling Down</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="temp-start" class="btn" onclick="toggleTemperature()">Start</button>
+                    
+                    <div class="preview">
+                        <div class="preview-label">Oil Temperature</div>
+                        <div id="temp-value" class="preview-value">45.0 °C</div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Simulates:</strong> XFMR_OIL_TEMP (addr 100), XFMR_WNDG_TEMP (addr 101), XFMR_AMB_TEMP (addr 102)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Status Simulation -->
+        <div class="section">
+            <h2>🔧 Equipment Status Control</h2>
+            <div class="sim-card">
+                <h3>Breaker & Protection Status (Discrete Inputs)</h3>
+                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Toggle equipment status flags</p>
+                
+                <div class="pulse-grid">
+                    <button id="pulse-0" class="pulse-btn" onclick="toggleStatus(0)">
+                        Breaker 52A (Closed)<br>
+                        <small>DI Address 0</small>
+                    </button>
+                    <button id="pulse-1" class="pulse-btn" onclick="toggleStatus(1)">
+                        Breaker 52B (Open)<br>
+                        <small>DI Address 1</small>
+                    </button>
+                    <button id="pulse-2" class="pulse-btn" onclick="toggleStatus(2)">
+                        Breaker Ready<br>
+                        <small>DI Address 2</small>
+                    </button>
+                    <button id="pulse-3" class="pulse-btn" onclick="toggleStatus(3)">
+                        Spring Charged<br>
+                        <small>DI Address 3</small>
+                    </button>
+                    <button id="pulse-30" class="pulse-btn" onclick="toggleStatus(30)">
+                        Protection Enabled<br>
+                        <small>DI Address 30</small>
+                    </button>
+                    <button id="pulse-31" class="pulse-btn" onclick="toggleStatus(31)">
+                        50 Inst OC Pickup<br>
+                        <small>DI Address 31</small>
+                    </button>
+                    <button id="pulse-32" class="pulse-btn" onclick="toggleStatus(32)">
+                        51 TOC Pickup<br>
+                        <small>DI Address 32</small>
+                    </button>
+                    <button id="pulse-35" class="pulse-btn" onclick="toggleStatus(35)">
+                        27 UV Pickup<br>
+                        <small>DI Address 35</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario Presets -->
+        <div class="section">
+            <div class="preset-section">
+                <h3>Quick Scenario Presets</h3>
+                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Load pre-configured test scenarios</p>
+                <div class="preset-grid">
+                    <button class="preset-btn" onclick="loadPreset('normal')">Normal Operation</button>
+                    <button class="preset-btn" onclick="loadPreset('highload')">High Load</button>
+                    <button class="preset-btn" onclick="loadPreset('undervoltage')">Undervoltage</button>
+                    <button class="preset-btn" onclick="loadPreset('overvoltage')">Overvoltage</button>
+                    <button class="preset-btn" onclick="loadPreset('underfrequency')">Underfrequency</button>
+                    <button class="preset-btn" onclick="loadPreset('overload')">Transformer Overload</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const simulations = {
-            sine: { active: false, interval: null, phase: 0, history: [] },
-            ramp: { active: false, interval: null, currentValue: 0, history: [] },
-            random: { active: false, interval: null, currentValue: 500, history: [] },
-            square: { active: false, interval: null, state: false, history: [] }
+            voltage: { active: false, interval: null, history: [], time: 0 },
+            voltagell: { active: false, interval: null },
+            current: { active: false, interval: null, history: [], value: 100 },
+            power: { active: false, interval: null },
+            frequency: { active: false, interval: null, history: [], value: 60 },
+            temperature: { active: false, interval: null }
         };
 
-        const charts = {
-            sine: document.getElementById('sine-chart').getContext('2d'),
-            ramp: document.getElementById('ramp-chart').getContext('2d'),
-            random: document.getElementById('random-chart').getContext('2d'),
-            square: document.getElementById('square-chart').getContext('2d')
-        };
-
-        Object.keys(charts).forEach(key => {
-            const ctx = charts[key];
-            ctx.canvas.width = ctx.canvas.offsetWidth;
-            ctx.canvas.height = ctx.canvas.offsetHeight;
+        // Initialize charts
+        const charts = {};
+        ['voltage', 'current', 'frequency'].forEach(id => {
+            const canvas = document.getElementById(`${id}-chart`);
+            if (canvas) {
+                charts[id] = canvas.getContext('2d');
+            }
         });
 
-        function drawChart(chartName, values) {
-            const ctx = charts[chartName];
+        function drawChart(chartId, data) {
+            const ctx = charts[chartId];
+            if (!ctx) return;
+            
             const canvas = ctx.canvas;
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
             
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, width, height);
             
-            if (values.length < 2) return;
+            if (data.length < 2) return;
             
-            const max = Math.max(...values);
-            const min = Math.min(...values);
+            const max = Math.max(...data);
+            const min = Math.min(...data);
             const range = max - min || 1;
-            
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 5; i++) {
-                const y = (canvas.height / 4) * i;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
+            const step = width / (data.length - 1);
             
             ctx.strokeStyle = '#1a365d';
             ctx.lineWidth = 2;
             ctx.beginPath();
             
-            const step = canvas.width / (values.length - 1);
-            values.forEach((value, i) => {
+            data.forEach((value, i) => {
                 const x = i * step;
-                const y = canvas.height - ((value - min) / range) * (canvas.height - 20) - 10;
-                
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
+                const y = height - ((value - min) / range) * (height - 20) - 10;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             });
             
             ctx.stroke();
+            
+            // Draw axes
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height - 10);
+            ctx.lineTo(width, height - 10);
+            ctx.stroke();
         }
 
-        function toggleSineWave() {
-            const sim = simulations.sine;
+        function toggleVoltage() {
+            const sim = simulations.voltage;
             
             if (sim.active) {
                 clearInterval(sim.interval);
                 sim.active = false;
-                document.getElementById('sine-status').textContent = 'Stopped';
-                document.getElementById('sine-status').className = 'status-badge status-stopped';
-                document.getElementById('sine-start').textContent = 'Start';
+                document.getElementById('voltage-status').textContent = 'Stopped';
+                document.getElementById('voltage-status').className = 'status-badge status-stopped';
+                document.getElementById('voltage-start').textContent = 'Start';
             } else {
-                const register = parseInt(document.getElementById('sine-register').value);
-                const amplitude = parseInt(document.getElementById('sine-amplitude').value);
-                const frequency = parseFloat(document.getElementById('sine-frequency').value);
-                const offset = parseInt(document.getElementById('sine-offset').value);
+                const nominal = parseFloat(document.getElementById('voltage-nominal').value);
+                const variation = parseFloat(document.getElementById('voltage-variation').value);
+                const frequency = parseFloat(document.getElementById('voltage-frequency').value);
+                const unbalance = parseFloat(document.getElementById('voltage-unbalance').value);
                 
-                sim.phase = 0;
                 sim.history = [];
+                sim.time = 0;
                 sim.active = true;
                 
-                document.getElementById('sine-status').textContent = 'Running';
-                document.getElementById('sine-status').className = 'status-badge status-running';
-                document.getElementById('sine-start').textContent = 'Stop';
+                document.getElementById('voltage-status').textContent = 'Running';
+                document.getElementById('voltage-status').className = 'status-badge status-running';
+                document.getElementById('voltage-start').textContent = 'Stop';
                 
                 sim.interval = setInterval(() => {
-                    const value = Math.round(amplitude * Math.sin(sim.phase) + offset);
-                    sim.phase += 2 * Math.PI * frequency * 0.1;
+                    sim.time += 0.1;
                     
-                    document.getElementById('sine-value').textContent = value;
+                    // Calculate three-phase voltages with unbalance
+                    const variationAmt = (variation / 100) * nominal;
+                    const v1 = nominal + (Math.sin(sim.time * frequency * Math.PI * 2) * variationAmt);
+                    const v2 = nominal + (Math.sin((sim.time * frequency * Math.PI * 2) - (2 * Math.PI / 3)) * variationAmt) * (1 - unbalance/100);
+                    const v3 = nominal + (Math.sin((sim.time * frequency * Math.PI * 2) + (2 * Math.PI / 3)) * variationAmt) * (1 + unbalance/100);
+                    const vAvg = (v1 + v2 + v3) / 3;
                     
+                    // Convert to register values (scale 0.1)
+                    const v1_reg = Math.round(v1 * 10);
+                    const v2_reg = Math.round(v2 * 10);
+                    const v3_reg = Math.round(v3 * 10);
+                    const vavg_reg = Math.round(vAvg * 10);
+                    const unbal_reg = Math.round(unbalance * 100);
+                    
+                    document.getElementById('voltage-l1-value').textContent = v1.toFixed(1) + ' V';
+                    
+                    // Update registers
                     fetch('/api/set_input_register', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({address: register, value: value})
+                        body: JSON.stringify({address: 0, value: v1_reg})
+                    });
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 1, value: v2_reg})
+                    });
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 2, value: v3_reg})
+                    });
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 6, value: vavg_reg})
+                    });
+                    fetch('/api/set_input_register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 8, value: unbal_reg})
                     });
                     
-                    sim.history.push(value);
+                    sim.history.push(v1);
                     if (sim.history.length > 100) sim.history.shift();
-                    drawChart('sine', sim.history);
+                    drawChart('voltage', sim.history);
                 }, 100);
             }
         }
 
-        function toggleRamp() {
-            const sim = simulations.ramp;
+        function toggleVoltageLL() {
+            const sim = simulations.voltagell;
             
             if (sim.active) {
                 clearInterval(sim.interval);
                 sim.active = false;
-                document.getElementById('ramp-status').textContent = 'Stopped';
-                document.getElementById('ramp-status').className = 'status-badge status-stopped';
-                document.getElementById('ramp-start').textContent = 'Start';
+                document.getElementById('voltage-ll-status').textContent = 'Stopped';
+                document.getElementById('voltage-ll-status').className = 'status-badge status-stopped';
+                document.getElementById('voltage-ll-start').textContent = 'Start';
             } else {
-                const register = parseInt(document.getElementById('ramp-register').value);
-                const minVal = parseInt(document.getElementById('ramp-min').value);
-                const maxVal = parseInt(document.getElementById('ramp-max').value);
-                const period = parseInt(document.getElementById('ramp-period').value);
+                const nominal = parseFloat(document.getElementById('voltage-ll-nominal').value);
+                const variation = parseFloat(document.getElementById('voltage-ll-variation').value);
                 
-                sim.currentValue = minVal;
-                sim.history = [];
+                sim.time = 0;
                 sim.active = true;
                 
-                const step = (maxVal - minVal) / (period * 10);
-                
-                document.getElementById('ramp-status').textContent = 'Running';
-                document.getElementById('ramp-status').className = 'status-badge status-running';
-                document.getElementById('ramp-start').textContent = 'Stop';
+                document.getElementById('voltage-ll-status').textContent = 'Running';
+                document.getElementById('voltage-ll-status').className = 'status-badge status-running';
+                document.getElementById('voltage-ll-start').textContent = 'Stop';
                 
                 sim.interval = setInterval(() => {
-                    sim.currentValue += step;
-                    if (sim.currentValue >= maxVal) {
-                        sim.currentValue = minVal;
+                    sim.time += 0.1;
+                    
+                    const variationAmt = (variation / 100) * nominal;
+                    const v12 = nominal + (Math.sin(sim.time * 0.1 * Math.PI * 2) * variationAmt);
+                    const v23 = nominal + (Math.sin((sim.time * 0.1 * Math.PI * 2) - (2 * Math.PI / 3)) * variationAmt);
+                    const v31 = nominal + (Math.sin((sim.time * 0.1 * Math.PI * 2) + (2 * Math.PI / 3)) * variationAmt);
+                    const vAvgLL = (v12 + v23 + v31) / 3;
+                    
+                    document.getElementById('voltage-ll-value').textContent = v12.toFixed(1) + ' V';
+                    
+                    // Update registers (scale 0.1)
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 3, value: Math.round(v12 * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 4, value: Math.round(v23 * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 5, value: Math.round(v31 * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 7, value: Math.round(vAvgLL * 10)})});
+                }, 100);
+            }
+        }
+
+        function toggleCurrent() {
+            const sim = simulations.current;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('current-status').textContent = 'Stopped';
+                document.getElementById('current-status').className = 'status-badge status-stopped';
+                document.getElementById('current-start').textContent = 'Start';
+            } else {
+                const base = parseFloat(document.getElementById('current-base').value);
+                const pattern = document.getElementById('current-pattern').value;
+                const unbalance = parseFloat(document.getElementById('current-unbalance').value);
+                
+                sim.value = base;
+                sim.history = [];
+                sim.time = 0;
+                sim.active = true;
+                
+                document.getElementById('current-status').textContent = 'Running';
+                document.getElementById('current-status').className = 'status-badge status-running';
+                document.getElementById('current-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    sim.time += 0.1;
+                    
+                    let current = base;
+                    if (pattern === 'ramp') {
+                        current = base + (sim.time % 50) * 2;
+                    } else if (pattern === 'cycle') {
+                        current = base + Math.sin(sim.time * 0.05) * base * 0.3;
+                    } else if (pattern === 'random') {
+                        sim.value += (Math.random() - 0.5) * 5;
+                        sim.value = Math.max(base * 0.5, Math.min(base * 1.5, sim.value));
+                        current = sim.value;
                     }
                     
-                    const value = Math.round(sim.currentValue);
-                    document.getElementById('ramp-value').textContent = value;
+                    const i1 = current;
+                    const i2 = current * (1 - unbalance/100);
+                    const i3 = current * (1 + unbalance/100);
+                    const iAvg = (i1 + i2 + i3) / 3;
                     
-                    fetch('/api/set_input_register', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({address: register, value: value})
-                    });
+                    document.getElementById('current-value').textContent = i1.toFixed(1) + ' A';
                     
-                    sim.history.push(value);
+                    // Update registers (scale 0.01)
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 20, value: Math.round(i1 * 100)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 21, value: Math.round(i2 * 100)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 22, value: Math.round(i3 * 100)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 25, value: Math.round(iAvg * 100)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 26, value: Math.round(unbalance * 100)})});
+                    
+                    sim.history.push(i1);
                     if (sim.history.length > 100) sim.history.shift();
-                    drawChart('ramp', sim.history);
+                    drawChart('current', sim.history);
                 }, 100);
             }
         }
 
-        function toggleRandom() {
-            const sim = simulations.random;
+        function togglePower() {
+            const sim = simulations.power;
             
             if (sim.active) {
                 clearInterval(sim.interval);
                 sim.active = false;
-                document.getElementById('random-status').textContent = 'Stopped';
-                document.getElementById('random-status').className = 'status-badge status-stopped';
-                document.getElementById('random-start-btn').textContent = 'Start';
+                document.getElementById('power-status').textContent = 'Stopped';
+                document.getElementById('power-status').className = 'status-badge status-stopped';
+                document.getElementById('power-start').textContent = 'Start';
             } else {
-                const register = parseInt(document.getElementById('random-register').value);
-                const startVal = parseInt(document.getElementById('random-start-value').value);
-                const stepSize = parseInt(document.getElementById('random-step').value);
-                const minVal = parseInt(document.getElementById('random-min').value);
-                const maxVal = parseInt(document.getElementById('random-max').value);
+                const activePower = parseFloat(document.getElementById('power-active').value);
+                const pf = parseFloat(document.getElementById('power-pf').value);
+                const pattern = document.getElementById('power-pattern').value;
                 
-                sim.currentValue = startVal;
-                sim.history = [];
+                sim.time = 0;
                 sim.active = true;
                 
-                document.getElementById('random-status').textContent = 'Running';
-                document.getElementById('random-status').className = 'status-badge status-running';
-                document.getElementById('random-start-btn').textContent = 'Stop';
+                document.getElementById('power-status').textContent = 'Running';
+                document.getElementById('power-status').className = 'status-badge status-running';
+                document.getElementById('power-start').textContent = 'Stop';
                 
                 sim.interval = setInterval(() => {
-                    const change = (Math.random() - 0.5) * 2 * stepSize;
-                    sim.currentValue += change;
-                    sim.currentValue = Math.max(minVal, Math.min(maxVal, sim.currentValue));
+                    sim.time += 0.1;
                     
-                    const value = Math.round(sim.currentValue);
-                    document.getElementById('random-value').textContent = value;
-                    
-                    fetch('/api/set_input_register', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({address: register, value: value})
-                    });
-                    
-                    sim.history.push(value);
-                    if (sim.history.length > 100) sim.history.shift();
-                    drawChart('random', sim.history);
-                }, 100);
-            }
-        }
-
-        function toggleSquareWave() {
-            const sim = simulations.square;
-            
-            if (sim.active) {
-                clearInterval(sim.interval);
-                sim.active = false;
-                document.getElementById('square-status').textContent = 'Stopped';
-                document.getElementById('square-status').className = 'status-badge status-stopped';
-                document.getElementById('square-start').textContent = 'Start';
-            } else {
-                const register = parseInt(document.getElementById('square-register').value);
-                const highVal = parseInt(document.getElementById('square-high').value);
-                const lowVal = parseInt(document.getElementById('square-low').value);
-                const period = parseFloat(document.getElementById('square-period').value);
-                
-                sim.state = false;
-                sim.history = [];
-                sim.active = true;
-                
-                document.getElementById('square-status').textContent = 'Running';
-                document.getElementById('square-status').className = 'status-badge status-running';
-                document.getElementById('square-start').textContent = 'Stop';
-                
-                sim.interval = setInterval(() => {
-                    sim.state = !sim.state;
-                    const value = sim.state ? highVal : lowVal;
-                    
-                    document.getElementById('square-value').textContent = value;
-                    
-                    fetch('/api/set_input_register', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({address: register, value: value})
-                    });
-                    
-                    for (let i = 0; i < 5; i++) {
-                        sim.history.push(value);
+                    let pTotal = activePower;
+                    if (pattern === 'varying') {
+                        pTotal = activePower + Math.sin(sim.time * 0.1) * activePower * 0.2;
                     }
-                    if (sim.history.length > 100) sim.history = sim.history.slice(-100);
-                    drawChart('square', sim.history);
-                }, period * 500);
+                    
+                    const qTotal = pTotal * Math.tan(Math.acos(pf));
+                    const sTotal = pTotal / pf;
+                    
+                    document.getElementById('power-value').textContent = pTotal.toFixed(1) + ' kW';
+                    
+                    // Update registers (scale 0.1)
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 43, value: Math.round(pTotal * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 47, value: Math.round(qTotal * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 51, value: Math.round(sTotal * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 55, value: Math.round(pf * 1000)})});
+                }, 200);
             }
         }
 
-        function togglePulse(address) {
+        function toggleFrequency() {
+            const sim = simulations.frequency;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('frequency-status').textContent = 'Stopped';
+                document.getElementById('frequency-status').className = 'status-badge status-stopped';
+                document.getElementById('frequency-start').textContent = 'Start';
+            } else {
+                const nominal = parseFloat(document.getElementById('frequency-nominal').value);
+                const deviation = parseFloat(document.getElementById('frequency-deviation').value);
+                const rocof = parseFloat(document.getElementById('frequency-rocof').value);
+                const pattern = document.getElementById('frequency-pattern').value;
+                
+                sim.value = nominal;
+                sim.history = [];
+                sim.time = 0;
+                sim.active = true;
+                
+                document.getElementById('frequency-status').textContent = 'Running';
+                document.getElementById('frequency-status').className = 'status-badge status-running';
+                document.getElementById('frequency-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    sim.time += 0.1;
+                    
+                    let freq = nominal;
+                    if (pattern === 'drift') {
+                        freq = nominal + Math.sin(sim.time * 0.02) * deviation;
+                    } else if (pattern === 'oscillate') {
+                        freq = nominal + Math.sin(sim.time * 0.5) * deviation;
+                    } else {
+                        freq = nominal + (Math.random() - 0.5) * deviation * 0.2;
+                    }
+                    
+                    const freqDev = freq - nominal;
+                    
+                    document.getElementById('frequency-value').textContent = freq.toFixed(2) + ' Hz';
+                    
+                    // Update registers
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 70, value: Math.round(freq * 100)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 71, value: Math.round(freqDev * 1000)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 72, value: Math.round(rocof * 1000)})});
+                    
+                    sim.history.push(freq);
+                    if (sim.history.length > 100) sim.history.shift();
+                    drawChart('frequency', sim.history);
+                }, 200);
+            }
+        }
+
+        function toggleTemperature() {
+            const sim = simulations.temperature;
+            
+            if (sim.active) {
+                clearInterval(sim.interval);
+                sim.active = false;
+                document.getElementById('temp-status').textContent = 'Stopped';
+                document.getElementById('temp-status').className = 'status-badge status-stopped';
+                document.getElementById('temp-start').textContent = 'Start';
+            } else {
+                let oilTemp = parseFloat(document.getElementById('temp-oil').value);
+                let windingTemp = parseFloat(document.getElementById('temp-winding').value);
+                const pattern = document.getElementById('temp-pattern').value;
+                
+                sim.active = true;
+                
+                document.getElementById('temp-status').textContent = 'Running';
+                document.getElementById('temp-status').className = 'status-badge status-running';
+                document.getElementById('temp-start').textContent = 'Stop';
+                
+                sim.interval = setInterval(() => {
+                    if (pattern === 'heating') {
+                        oilTemp += 0.1;
+                        windingTemp += 0.15;
+                    } else if (pattern === 'cooling') {
+                        oilTemp -= 0.1;
+                        windingTemp -= 0.15;
+                    } else {
+                        oilTemp += (Math.random() - 0.5) * 0.2;
+                        windingTemp += (Math.random() - 0.5) * 0.2;
+                    }
+                    
+                    oilTemp = Math.max(20, Math.min(120, oilTemp));
+                    windingTemp = Math.max(25, Math.min(150, windingTemp));
+                    
+                    document.getElementById('temp-value').textContent = oilTemp.toFixed(1) + ' °C';
+                    
+                    // Update registers (scale 0.1)
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 100, value: Math.round(oilTemp * 10)})});
+                    fetch('/api/set_input_register', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({address: 101, value: Math.round(windingTemp * 10)})});
+                }, 500);
+            }
+        }
+
+        function toggleStatus(address) {
             const btn = document.getElementById(`pulse-${address}`);
             const isActive = btn.classList.contains('active');
             
@@ -691,15 +1021,106 @@
             });
         }
 
+        function loadPreset(preset) {
+            stopAllSimulations();
+            
+            const presets = {
+                normal: {
+                    voltage: {nominal: 120, variation: 2, unbalance: 0.5},
+                    voltagell: {nominal: 208, variation: 2},
+                    current: {base: 100, pattern: 'steady', unbalance: 1},
+                    power: {active: 120, pf: 0.95, pattern: 'steady'},
+                    frequency: {nominal: 60, deviation: 0.02, pattern: 'stable'},
+                    temp: {oil: 45, winding: 55, pattern: 'steady'}
+                },
+                highload: {
+                    voltage: {nominal: 117, variation: 3, unbalance: 1.5},
+                    current: {base: 180, pattern: 'steady', unbalance: 2},
+                    power: {active: 210, pf: 0.92, pattern: 'varying'},
+                    frequency: {nominal: 59.95, deviation: 0.05, pattern: 'drift'},
+                    temp: {oil: 65, winding: 85, pattern: 'heating'}
+                },
+                undervoltage: {
+                    voltage: {nominal: 108, variation: 5, unbalance: 3},
+                    voltagell: {nominal: 187, variation: 5},
+                    current: {base: 90, pattern: 'random', unbalance: 2},
+                    frequency: {nominal: 59.85, deviation: 0.1, pattern: 'oscillate'}
+                },
+                overvoltage: {
+                    voltage: {nominal: 132, variation: 4, unbalance: 2},
+                    voltagell: {nominal: 229, variation: 4},
+                    current: {base: 85, pattern: 'steady', unbalance: 1},
+                    frequency: {nominal: 60.15, deviation: 0.08, pattern: 'drift'}
+                },
+                underfrequency: {
+                    voltage: {nominal: 119, variation: 2, unbalance: 1},
+                    current: {base: 95, pattern: 'cycle', unbalance: 1.5},
+                    frequency: {nominal: 59.5, deviation: 0.3, pattern: 'drift'}
+                },
+                overload: {
+                    current: {base: 220, pattern: 'varying', unbalance: 3},
+                    power: {active: 260, pf: 0.88, pattern: 'varying'},
+                    temp: {oil: 85, winding: 110, pattern: 'heating'}
+                }
+            };
+            
+            const p = presets[preset];
+            if (!p) return;
+            
+            // Apply voltage settings
+            if (p.voltage) {
+                document.getElementById('voltage-nominal').value = p.voltage.nominal;
+                document.getElementById('voltage-variation').value = p.voltage.variation;
+                document.getElementById('voltage-unbalance').value = p.voltage.unbalance;
+            }
+            
+            // Apply voltage LL settings
+            if (p.voltagell) {
+                document.getElementById('voltage-ll-nominal').value = p.voltagell.nominal;
+                document.getElementById('voltage-ll-variation').value = p.voltagell.variation;
+            }
+            
+            // Apply current settings
+            if (p.current) {
+                document.getElementById('current-base').value = p.current.base;
+                document.getElementById('current-pattern').value = p.current.pattern;
+                document.getElementById('current-unbalance').value = p.current.unbalance;
+            }
+            
+            // Apply power settings
+            if (p.power) {
+                document.getElementById('power-active').value = p.power.active;
+                document.getElementById('power-pf').value = p.power.pf;
+                document.getElementById('power-pattern').value = p.power.pattern;
+            }
+            
+            // Apply frequency settings
+            if (p.frequency) {
+                document.getElementById('frequency-nominal').value = p.frequency.nominal;
+                document.getElementById('frequency-deviation').value = p.frequency.deviation;
+                document.getElementById('frequency-pattern').value = p.frequency.pattern;
+            }
+            
+            // Apply temperature settings
+            if (p.temp) {
+                document.getElementById('temp-oil').value = p.temp.oil;
+                document.getElementById('temp-winding').value = p.temp.winding;
+                document.getElementById('temp-pattern').value = p.temp.pattern;
+            }
+            
+            alert(`Loaded preset: ${preset.toUpperCase()}\n\nClick START buttons to begin simulation.`);
+        }
+
         function stopAllSimulations() {
             Object.keys(simulations).forEach(key => {
                 const sim = simulations[key];
-                if (sim.active) {
+                if (sim.active && sim.interval) {
                     clearInterval(sim.interval);
                     sim.active = false;
-                    document.getElementById(`${key}-status`).textContent = 'Stopped';
-                    document.getElementById(`${key}-status`).className = 'status-badge status-stopped';
-                    const btnId = key === 'random' ? 'random-start-btn' : `${key}-start`;
+                    const statusId = key === 'voltagell' ? 'voltage-ll-status' : `${key}-status`;
+                    const btnId = key === 'voltagell' ? 'voltage-ll-start' : `${key}-start`;
+                    document.getElementById(statusId).textContent = 'Stopped';
+                    document.getElementById(statusId).className = 'status-badge status-stopped';
                     document.getElementById(btnId).textContent = 'Start';
                 }
             });
@@ -707,30 +1128,32 @@
 
         function saveSimulationConfig() {
             const config = {
-                sine: {
-                    register: parseInt(document.getElementById('sine-register').value),
-                    amplitude: parseInt(document.getElementById('sine-amplitude').value),
-                    frequency: parseFloat(document.getElementById('sine-frequency').value),
-                    offset: parseInt(document.getElementById('sine-offset').value)
+                voltage: {
+                    nominal: parseFloat(document.getElementById('voltage-nominal').value),
+                    variation: parseFloat(document.getElementById('voltage-variation').value),
+                    frequency: parseFloat(document.getElementById('voltage-frequency').value),
+                    unbalance: parseFloat(document.getElementById('voltage-unbalance').value)
                 },
-                ramp: {
-                    register: parseInt(document.getElementById('ramp-register').value),
-                    min: parseInt(document.getElementById('ramp-min').value),
-                    max: parseInt(document.getElementById('ramp-max').value),
-                    period: parseInt(document.getElementById('ramp-period').value)
+                current: {
+                    base: parseFloat(document.getElementById('current-base').value),
+                    pattern: document.getElementById('current-pattern').value,
+                    unbalance: parseFloat(document.getElementById('current-unbalance').value)
                 },
-                random: {
-                    register: parseInt(document.getElementById('random-register').value),
-                    start: parseInt(document.getElementById('random-start-value').value),
-                    step: parseInt(document.getElementById('random-step').value),
-                    min: parseInt(document.getElementById('random-min').value),
-                    max: parseInt(document.getElementById('random-max').value)
+                power: {
+                    active: parseFloat(document.getElementById('power-active').value),
+                    pf: parseFloat(document.getElementById('power-pf').value),
+                    pattern: document.getElementById('power-pattern').value
                 },
-                square: {
-                    register: parseInt(document.getElementById('square-register').value),
-                    high: parseInt(document.getElementById('square-high').value),
-                    low: parseInt(document.getElementById('square-low').value),
-                    period: parseFloat(document.getElementById('square-period').value)
+                frequency: {
+                    nominal: parseFloat(document.getElementById('frequency-nominal').value),
+                    deviation: parseFloat(document.getElementById('frequency-deviation').value),
+                    rocof: parseFloat(document.getElementById('frequency-rocof').value),
+                    pattern: document.getElementById('frequency-pattern').value
+                },
+                temperature: {
+                    oil: parseFloat(document.getElementById('temp-oil').value),
+                    winding: parseFloat(document.getElementById('temp-winding').value),
+                    pattern: document.getElementById('temp-pattern').value
                 }
             };
             
@@ -738,12 +1161,24 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'simulation_config.json';
+            a.download = 'power_simulation_config.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+
+        // Initialize breaker status on load
+        window.addEventListener('load', () => {
+            // Set breaker 52B (open) active by default
+            toggleStatus(1);
+            // Set breaker ready
+            toggleStatus(2);
+            // Set spring charged
+            toggleStatus(3);
+            // Set protection enabled
+            toggleStatus(30);
+        });
     </script>
 </body>
 </html>
