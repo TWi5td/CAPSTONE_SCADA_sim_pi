@@ -8,6 +8,6 @@ Werkzeug==3.0.1
 # Modbus Communication
 pymodbus==3.6.2
 
-# Optional: For enhanced features
+# Optional: Enhanced features
 # python-dotenv==1.0.0  # For environment variable management
 # gunicorn==21.2.0      # For production deployment
