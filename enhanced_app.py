@@ -25,7 +25,7 @@ SERVER_PORT = 5002
 FLASK_PORT = 5000
 
 # Expanded register counts for power industry applications
-REGISTER_COUNT = 500  # Expanded from 100 to accommodate all power variables
+REGISTER_COUNT = 500  # accommodate all power variables
 
 app = Flask(__name__)
 
